@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sheet";
 
 function Navbar() {
-  const { isEmpty, totalUniqueItems, items, updateItemQuantity, removeItem } =
+  const { isEmpty, totalItems, items, updateItemQuantity, removeItem } =
     useCart();
 
   return (
@@ -27,10 +27,14 @@ function Navbar() {
 
       <Sheet>
         <SheetTrigger asChild>
-          <Button>
-            <LuShoppingCart className="w-4 h-4 mr-2" />
-            Cart
-          </Button>
+          <div
+            className="relative cart-button"
+            current-count={totalItems.toString()}>
+            <Button>
+              <LuShoppingCart className="w-4 h-4 mr-2" />
+              Cart
+            </Button>
+          </div>
         </SheetTrigger>
         <SheetContent>
           <SheetHeader className="h-[10vh]">
