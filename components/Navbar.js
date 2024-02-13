@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import { FileTextIcon } from "@radix-ui/react-icons";
 import { LuShoppingCart } from "react-icons/lu";
@@ -17,9 +17,14 @@ import {
 function Navbar() {
   const { isEmpty, totalItems, items, updateItemQuantity, removeItem } =
     useCart();
+  const [cartCount, setCartCount] = useState();
+
+  useEffect(() => {
+    setCartCount(totalItems);
+  }, [items]);
 
   return (
-    <div className="w-100 h-[10vh] flex items-center p-4 justify-between">
+    <div className="w-100 h-[10vh] flex items-center sticky p-4 justify-between">
       <Button variant="secondary">
         <FileTextIcon className="w-4 h-4 mr-2" />
         Bill
@@ -27,9 +32,7 @@ function Navbar() {
 
       <Sheet>
         <SheetTrigger asChild>
-          <div
-            className="relative cart-button"
-            current-count={totalItems.toString()}>
+          <div className="relative cart-button me-2" current-count={cartCount}>
             <Button>
               <LuShoppingCart className="w-4 h-4 mr-2" />
               Cart
