@@ -5,16 +5,56 @@ import { useCart } from "react-use-cart";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "./ui/badge";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Separator } from "./ui/separator";
+import { useToast } from "@/components/ui/use-toast";
 
 function MenuItem({ dish }) {
   const Chance = require("chance");
   const chance = Chance();
+  const { toast } = useToast();
   const { addItem, items, updateItemQuantity, getItem } = useCart();
-
+  const [dishPrice, setDishPrice] = useState(dish.price);
+  const [chosenCustomization, setChosenCustomization] = useState(() => {
+    let temp = {};
+    if (dish.availableCustomizations) {
+      Object.keys(dish.availableCustomizations).forEach((customization) => {
+        temp[[customization]] = [];
+      });
+    }
+    return temp;
+  });
   const addItemToCart = () => {
     dish.id = chance.guid();
     addItem(dish);
   };
+
+  useEffect(() => {
+    setDishPrice(dish.price);
+    if (dish.availableCustomizations) {
+      let customizationTotal = dish.price;
+      Object.keys(dish.availableCustomizations).forEach((customization) => {
+        chosenCustomization[customization].forEach((element) => {
+          customizationTotal +=
+            dish.availableCustomizations[customization].values[element];
+        });
+      });
+      setDishPrice(customizationTotal);
+      //   console.log(customizationTotal);
+    }
+  }, [chosenCustomization]);
 
   return (
     <>
@@ -90,6 +130,202 @@ function MenuItem({ dish }) {
                   +
                 </Badge>
               </div>
+            )}
+          {dish.availableCustomizations &&
+            items.filter((item) => item._id === dish._id).length === 0 && (
+              <Drawer>
+                <DrawerTrigger
+                  className="absolute right-[15%] bottom-[5px]"
+                  asChild>
+                  <Button className="absolute right-[15%] bottom-[5px]">
+                    Add
+                  </Button>
+                </DrawerTrigger>
+                <DrawerContent>
+                  <DrawerHeader>
+                    <DrawerTitle>Customize as per your taste!</DrawerTitle>
+                    <DrawerDescription>
+                      {dish.name} ✦ ₹{dish.price} onwards.
+                    </DrawerDescription>
+                  </DrawerHeader>
+                  <div className="p-4">
+                    {Object.keys(dish.availableCustomizations).map(
+                      (customization) => {
+                        return (
+                          <div className="my-4">
+                            <h1 className="mt-2 font-bold">
+                              {customization}{" "}
+                              {dish.availableCustomizations[customization]
+                                ?.allowed === 1 && "*"}
+                            </h1>
+                            <p className="mb-2 text-xs font-thin">
+                              Choose any{" "}
+                              {dish.availableCustomizations[customization]
+                                ?.allowed === -1
+                                ? ""
+                                : dish.availableCustomizations[customization]
+                                    ?.allowed}
+                            </p>
+                            {dish.availableCustomizations[customization]
+                              ?.allowed === 1 && (
+                              <RadioGroup className="gap-0">
+                                {Object.keys(
+                                  dish.availableCustomizations[customization]
+                                    .values
+                                ).map((value) => {
+                                  return (
+                                    <>
+                                      <div className="flex items-center my-1 space-x-2">
+                                        <RadioGroupItem
+                                          value={value}
+                                          checked={chosenCustomization[
+                                            customization
+                                          ].includes(value)}
+                                          id="r1"
+                                          onClick={(e) => {
+                                            let temp =
+                                              chosenCustomization[
+                                                [customization]
+                                              ];
+                                            if (temp.length > 0) {
+                                              temp.pop();
+                                            }
+                                            temp.push(e.target.value);
+                                            setChosenCustomization({
+                                              ...chosenCustomization,
+                                              [[customization]]: temp,
+                                            });
+                                          }}
+                                        />
+                                        <div className="flex items-center justify-between w-[100%]">
+                                          <Label htmlFor="r1">{value}</Label>
+                                          <span>
+                                            ₹{" "}
+                                            {
+                                              dish.availableCustomizations[
+                                                customization
+                                              ].values[value]
+                                            }
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </>
+                                  );
+                                })}
+                              </RadioGroup>
+                            )}
+                            {dish.availableCustomizations[customization]
+                              ?.allowed !== 1 &&
+                              Object.keys(
+                                dish.availableCustomizations[customization]
+                                  .values
+                              ).map((value) => {
+                                return (
+                                  <>
+                                    <div className="flex items-center my-2 space-x-2">
+                                      <Checkbox
+                                        value={value}
+                                        id={value}
+                                        checked={chosenCustomization[
+                                          customization
+                                        ].includes(value)}
+                                        onClick={(e) => {
+                                          if (
+                                            dish.availableCustomizations[
+                                              [customization]
+                                            ].allowed !== -1 &&
+                                            dish.availableCustomizations[
+                                              [customization]
+                                            ].allowed ===
+                                              chosenCustomization[
+                                                [customization]
+                                              ].length &&
+                                            !chosenCustomization[
+                                              customization
+                                            ].includes(value)
+                                          ) {
+                                            return;
+                                          }
+                                          let temp =
+                                            chosenCustomization[
+                                              [customization]
+                                            ];
+
+                                          if (temp.includes(e.target.value)) {
+                                            const index = temp.indexOf(
+                                              e.target.value
+                                            );
+                                            temp.splice(index, 1);
+                                            setChosenCustomization({
+                                              ...chosenCustomization,
+                                              [[customization]]: temp,
+                                            });
+                                            return;
+                                          }
+                                          temp.push(e.target.value);
+                                          setChosenCustomization({
+                                            ...chosenCustomization,
+                                            [[customization]]: temp,
+                                          });
+                                        }}
+                                      />
+                                      <div className="flex items-center justify-between w-[100%]">
+                                        <Label htmlFor={value}>{value}</Label>
+                                        <span>
+                                          ₹{" "}
+                                          {
+                                            dish.availableCustomizations[
+                                              customization
+                                            ].values[value]
+                                          }
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </>
+                                );
+                              })}
+                            <Separator className="my-2" />
+                          </div>
+                        );
+                      }
+                    )}
+                  </div>
+                  <DrawerFooter className="flex flex-row">
+                    <DrawerClose className="w-[50%]">
+                      <Button variant="outline" className="w-[100%]">
+                        Cancel
+                      </Button>
+                    </DrawerClose>
+                    <Button
+                      onClick={() => {
+                        Object.keys(chosenCustomization).forEach((cus) => {
+                          if (
+                            dish.availableCustomizations[[cus]].allowed === 1 &&
+                            chosenCustomization[[cus]].length !== 1
+                          ) {
+                            toast({
+                              variant: "destructive",
+                              title: "Please Fill All Required Fields",
+                              description:
+                                "Required Fields are marked with an *",
+                            });
+                            return;
+                          }
+                        });
+
+                        let copyOfDish = dish;
+                        copyOfDish.id = chance.guid();
+                        copyOfDish.price = dishPrice;
+                        copyOfDish.chosenCustomization = chosenCustomization;
+                        addItem(dish);
+                      }}
+                      className="w-[50%] font-bold">
+                      Add |{" ₹"}
+                      {dishPrice}
+                    </Button>
+                  </DrawerFooter>
+                </DrawerContent>
+              </Drawer>
             )}
         </div>
       </Card>
