@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "./ui/separator";
 import { useToast } from "@/components/ui/use-toast";
+import { HiFire } from "react-icons/hi";
 
 function MenuItem({ dish }) {
   const Chance = require("chance");
@@ -27,6 +28,7 @@ function MenuItem({ dish }) {
   const { toast } = useToast();
   const { addItem, items, updateItemQuantity, getItem } = useCart();
   const [dishPrice, setDishPrice] = useState(dish.price);
+  const [showCustomizationDrawer, setShowCustomizationDrawer] = useState(false);
   const [chosenCustomization, setChosenCustomization] = useState(() => {
     let temp = {};
     if (dish.availableCustomizations) {
@@ -36,6 +38,7 @@ function MenuItem({ dish }) {
     }
     return temp;
   });
+  const [dummyState, setDummyState] = useState(false);
   const addItemToCart = () => {
     dish.id = chance.guid();
     addItem(dish);
@@ -46,7 +49,7 @@ function MenuItem({ dish }) {
     if (dish.availableCustomizations) {
       let customizationTotal = dish.price;
       Object.keys(dish.availableCustomizations).forEach((customization) => {
-        chosenCustomization[customization].forEach((element) => {
+        chosenCustomization[customization]?.forEach((element) => {
           customizationTotal +=
             dish.availableCustomizations[customization].values[element];
         });
@@ -59,25 +62,33 @@ function MenuItem({ dish }) {
   return (
     <>
       <Card className="flex p-2 my-3 max-w-[768px] lg-min-w-[768px]">
-        <div className="w-[70%] ps-1 py-2 pe-4">
+        <div className="w-[70%] ps-1 py-2 pe-3">
           <CardTitle className="mb-2">
-            {dish.isVeg ? (
-              <img
-                src="https://img.icons8.com/color/480/vegetarian-food-symbol.png"
-                style={{ width: "15px", height: "15px" }}
-                className="mb-2 me-3"
-                alt=""
-              />
-            ) : (
-              <Image
-                src="/non-veg.png"
-                style={{ width: "15px", height: "15px" }}
-                className="mb-2 me-3"
-                width={15}
-                height={15}
-                alt=""
-              />
-            )}
+            <div className="flex items-center justify-between w-full">
+              {dish.isVeg ? (
+                <img
+                  src="https://img.icons8.com/color/480/vegetarian-food-symbol.png"
+                  style={{ width: "15px", height: "15px" }}
+                  className="mb-2 me-3"
+                  alt=""
+                />
+              ) : (
+                <Image
+                  src="/non-veg.png"
+                  style={{ width: "15px", height: "15px" }}
+                  className="mb-2 me-3"
+                  width={15}
+                  height={15}
+                  alt=""
+                />
+              )}
+              <div className="flex items-center">
+                <HiFire className="text-orange-600" />
+                <span className="font-light leading-none">
+                  {dish.calories} KCal
+                </span>
+              </div>
+            </div>
             {dish.name}
           </CardTitle>
           <CardDescription>₹ {dish.price}</CardDescription>
@@ -133,7 +144,9 @@ function MenuItem({ dish }) {
             )}
           {dish.availableCustomizations &&
             items.filter((item) => item._id === dish._id).length === 0 && (
-              <Drawer>
+              <Drawer
+                open={showCustomizationDrawer}
+                onOpenChange={setShowCustomizationDrawer}>
                 <DrawerTrigger
                   className="absolute right-[15%] bottom-[5px]"
                   asChild>
@@ -180,7 +193,7 @@ function MenuItem({ dish }) {
                                           value={value}
                                           checked={chosenCustomization[
                                             customization
-                                          ].includes(value)}
+                                          ]?.includes(value)}
                                           id="r1"
                                           onClick={(e) => {
                                             let temp =
@@ -228,7 +241,7 @@ function MenuItem({ dish }) {
                                         id={value}
                                         checked={chosenCustomization[
                                           customization
-                                        ].includes(value)}
+                                        ]?.includes(value)}
                                         onClick={(e) => {
                                           if (
                                             dish.availableCustomizations[
@@ -242,7 +255,7 @@ function MenuItem({ dish }) {
                                               ].length &&
                                             !chosenCustomization[
                                               customization
-                                            ].includes(value)
+                                            ]?.includes(value)
                                           ) {
                                             return;
                                           }
@@ -290,7 +303,7 @@ function MenuItem({ dish }) {
                       }
                     )}
                   </div>
-                  <DrawerFooter className="flex flex-row">
+                  <DrawerFooter className="flex flex-row" asChild>
                     <DrawerClose className="w-[50%]">
                       <Button variant="outline" className="w-[100%]">
                         Cancel
@@ -298,6 +311,7 @@ function MenuItem({ dish }) {
                     </DrawerClose>
                     <Button
                       onClick={() => {
+                        let flag = false;
                         Object.keys(chosenCustomization).forEach((cus) => {
                           if (
                             dish.availableCustomizations[[cus]].allowed === 1 &&
@@ -309,10 +323,11 @@ function MenuItem({ dish }) {
                               description:
                                 "Required Fields are marked with an *",
                             });
+                            flag = true;
                             return;
                           }
                         });
-
+                        if (flag) return;
                         let copyOfDish = dish;
                         copyOfDish.id = chance.guid();
                         copyOfDish.price = dishPrice;
@@ -326,6 +341,33 @@ function MenuItem({ dish }) {
                   </DrawerFooter>
                 </DrawerContent>
               </Drawer>
+            )}
+          {dish.availableCustomizations &&
+            items.filter((item) => item._id === dish._id).length > 0 && (
+              <div className="absolute right-[5%] bottom-[5px]">
+                <Badge
+                  onClick={() => {
+                    updateItemQuantity(
+                      items.filter((item) => item._id === dish._id)[0].id,
+                      items.filter((item) => item._id === dish._id)[0]
+                        .quantity - 1
+                    );
+                  }}
+                  style={{ borderRadius: "5px 0 0 5px" }}>
+                  -
+                </Badge>
+                <Badge variant="secondary" style={{ borderRadius: "0" }}>
+                  {items.filter((item) => item._id === dish._id)[0]?.quantity}
+                </Badge>
+                <Badge
+                  onClick={() => {
+                    setShowCustomizationDrawer(true);
+                    setDummyState(true);
+                  }}
+                  style={{ borderRadius: "0 5px  5px 0" }}>
+                  +
+                </Badge>
+              </div>
             )}
         </div>
       </Card>
