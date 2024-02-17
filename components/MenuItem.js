@@ -38,6 +38,12 @@ function MenuItem({ dish }) {
     }
     return temp;
   });
+  console.log("showCustomizationDrawer:", showCustomizationDrawer);
+  console.log(
+    "dish.availableCustomizations &&   items.filter((item) => item._id === dish._id).length === 0:",
+    dish.availableCustomizations &&
+      items.filter((item) => item._id === dish._id).length === 0
+  );
   const [dummyState, setDummyState] = useState(false);
   const addItemToCart = () => {
     dish.id = chance.guid();
@@ -84,7 +90,7 @@ function MenuItem({ dish }) {
               )}
               <div className="flex items-center">
                 <HiFire className="text-orange-600" />
-                <span className="font-light leading-none">
+                <span className="font-light leading-none text-[0.5rem]">
                   {dish.calories} KCal
                 </span>
               </div>
@@ -144,136 +150,62 @@ function MenuItem({ dish }) {
             )}
           {dish.availableCustomizations &&
             items.filter((item) => item._id === dish._id).length === 0 && (
-              <Drawer
-                open={showCustomizationDrawer}
-                onOpenChange={setShowCustomizationDrawer}>
-                <DrawerTrigger
-                  className="absolute right-[15%] bottom-[5px]"
-                  asChild>
-                  <Button className="absolute right-[15%] bottom-[5px]">
-                    Add
-                  </Button>
-                </DrawerTrigger>
-                <DrawerContent>
-                  <DrawerHeader>
-                    <DrawerTitle>Customize as per your taste!</DrawerTitle>
-                    <DrawerDescription>
-                      {dish.name} ✦ ₹{dish.price} onwards.
-                    </DrawerDescription>
-                  </DrawerHeader>
-                  <div className="p-4">
-                    {Object.keys(dish.availableCustomizations).map(
-                      (customization) => {
-                        return (
-                          <div className="my-4">
-                            <h1 className="mt-2 font-bold">
-                              {customization}{" "}
-                              {dish.availableCustomizations[customization]
-                                ?.allowed === 1 && "*"}
-                            </h1>
-                            <p className="mb-2 text-xs font-thin">
-                              Choose any{" "}
-                              {dish.availableCustomizations[customization]
-                                ?.allowed === -1
-                                ? ""
-                                : dish.availableCustomizations[customization]
-                                    ?.allowed}
-                            </p>
+              <Button
+                className="absolute right-[15%] bottom-[5px]"
+                onClick={() => setShowCustomizationDrawer(true)}>
+                Add
+              </Button>
+            )}
+          {dish.availableCustomizations && (
+            <Drawer dismissible={false} open={showCustomizationDrawer}>
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>Customize as per your taste!</DrawerTitle>
+                  <DrawerDescription>
+                    {dish.name} ✦ ₹{dish.price} onwards.
+                  </DrawerDescription>
+                </DrawerHeader>
+                <div className="p-4">
+                  {Object.keys(dish.availableCustomizations).map(
+                    (customization) => {
+                      return (
+                        <div className="my-4">
+                          <h1 className="mt-2 font-bold">
+                            {customization}{" "}
                             {dish.availableCustomizations[customization]
-                              ?.allowed === 1 && (
-                              <RadioGroup className="gap-0">
-                                {Object.keys(
-                                  dish.availableCustomizations[customization]
-                                    .values
-                                ).map((value) => {
-                                  return (
-                                    <>
-                                      <div className="flex items-center my-1 space-x-2">
-                                        <RadioGroupItem
-                                          value={value}
-                                          checked={chosenCustomization[
-                                            customization
-                                          ]?.includes(value)}
-                                          id="r1"
-                                          onClick={(e) => {
-                                            let temp =
-                                              chosenCustomization[
-                                                [customization]
-                                              ];
-                                            if (temp.length > 0) {
-                                              temp.pop();
-                                            }
-                                            temp.push(e.target.value);
-                                            setChosenCustomization({
-                                              ...chosenCustomization,
-                                              [[customization]]: temp,
-                                            });
-                                          }}
-                                        />
-                                        <div className="flex items-center justify-between w-[100%]">
-                                          <Label htmlFor="r1">{value}</Label>
-                                          <span>
-                                            ₹{" "}
-                                            {
-                                              dish.availableCustomizations[
-                                                customization
-                                              ].values[value]
-                                            }
-                                          </span>
-                                        </div>
-                                      </div>
-                                    </>
-                                  );
-                                })}
-                              </RadioGroup>
-                            )}
+                              ?.allowed === 1 && "*"}
+                          </h1>
+                          <p className="mb-2 text-xs font-thin">
+                            Choose any{" "}
                             {dish.availableCustomizations[customization]
-                              ?.allowed !== 1 &&
-                              Object.keys(
+                              ?.allowed === -1
+                              ? ""
+                              : dish.availableCustomizations[customization]
+                                  ?.allowed}
+                          </p>
+                          {dish.availableCustomizations[customization]
+                            ?.allowed === 1 && (
+                            <RadioGroup className="gap-0">
+                              {Object.keys(
                                 dish.availableCustomizations[customization]
                                   .values
                               ).map((value) => {
                                 return (
                                   <>
-                                    <div className="flex items-center my-2 space-x-2">
-                                      <Checkbox
+                                    <div className="flex items-center my-1 space-x-2">
+                                      <RadioGroupItem
                                         value={value}
-                                        id={value}
                                         checked={chosenCustomization[
                                           customization
                                         ]?.includes(value)}
+                                        id="r1"
                                         onClick={(e) => {
-                                          if (
-                                            dish.availableCustomizations[
-                                              [customization]
-                                            ].allowed !== -1 &&
-                                            dish.availableCustomizations[
-                                              [customization]
-                                            ].allowed ===
-                                              chosenCustomization[
-                                                [customization]
-                                              ].length &&
-                                            !chosenCustomization[
-                                              customization
-                                            ]?.includes(value)
-                                          ) {
-                                            return;
-                                          }
                                           let temp =
                                             chosenCustomization[
                                               [customization]
                                             ];
-
-                                          if (temp.includes(e.target.value)) {
-                                            const index = temp.indexOf(
-                                              e.target.value
-                                            );
-                                            temp.splice(index, 1);
-                                            setChosenCustomization({
-                                              ...chosenCustomization,
-                                              [[customization]]: temp,
-                                            });
-                                            return;
+                                          if (temp.length > 0) {
+                                            temp.pop();
                                           }
                                           temp.push(e.target.value);
                                           setChosenCustomization({
@@ -283,7 +215,7 @@ function MenuItem({ dish }) {
                                         }}
                                       />
                                       <div className="flex items-center justify-between w-[100%]">
-                                        <Label htmlFor={value}>{value}</Label>
+                                        <Label htmlFor="r1">{value}</Label>
                                         <span>
                                           ₹{" "}
                                           {
@@ -297,51 +229,120 @@ function MenuItem({ dish }) {
                                   </>
                                 );
                               })}
-                            <Separator className="my-2" />
-                          </div>
-                        );
-                      }
-                    )}
-                  </div>
-                  <DrawerFooter className="flex flex-row" asChild>
-                    <DrawerClose className="w-[50%]">
-                      <Button variant="outline" className="w-[100%]">
-                        Cancel
-                      </Button>
-                    </DrawerClose>
-                    <Button
-                      onClick={() => {
-                        let flag = false;
-                        Object.keys(chosenCustomization).forEach((cus) => {
-                          if (
-                            dish.availableCustomizations[[cus]].allowed === 1 &&
-                            chosenCustomization[[cus]].length !== 1
-                          ) {
-                            toast({
-                              variant: "destructive",
-                              title: "Please Fill All Required Fields",
-                              description:
-                                "Required Fields are marked with an *",
-                            });
-                            flag = true;
-                            return;
-                          }
-                        });
-                        if (flag) return;
-                        let copyOfDish = dish;
-                        copyOfDish.id = chance.guid();
-                        copyOfDish.price = dishPrice;
-                        copyOfDish.chosenCustomization = chosenCustomization;
-                        addItem(dish);
-                      }}
-                      className="w-[50%] font-bold">
-                      Add |{" ₹"}
-                      {dishPrice}
-                    </Button>
-                  </DrawerFooter>
-                </DrawerContent>
-              </Drawer>
-            )}
+                            </RadioGroup>
+                          )}
+                          {dish.availableCustomizations[customization]
+                            ?.allowed !== 1 &&
+                            Object.keys(
+                              dish.availableCustomizations[customization].values
+                            ).map((value) => {
+                              return (
+                                <>
+                                  <div className="flex items-center my-2 space-x-2">
+                                    <Checkbox
+                                      value={value}
+                                      id={value}
+                                      checked={chosenCustomization[
+                                        customization
+                                      ]?.includes(value)}
+                                      onClick={(e) => {
+                                        if (
+                                          dish.availableCustomizations[
+                                            [customization]
+                                          ].allowed !== -1 &&
+                                          dish.availableCustomizations[
+                                            [customization]
+                                          ].allowed ===
+                                            chosenCustomization[[customization]]
+                                              .length &&
+                                          !chosenCustomization[
+                                            customization
+                                          ]?.includes(value)
+                                        ) {
+                                          return;
+                                        }
+                                        let temp =
+                                          chosenCustomization[[customization]];
+
+                                        if (temp.includes(e.target.value)) {
+                                          const index = temp.indexOf(
+                                            e.target.value
+                                          );
+                                          temp.splice(index, 1);
+                                          setChosenCustomization({
+                                            ...chosenCustomization,
+                                            [[customization]]: temp,
+                                          });
+                                          return;
+                                        }
+                                        temp.push(e.target.value);
+                                        setChosenCustomization({
+                                          ...chosenCustomization,
+                                          [[customization]]: temp,
+                                        });
+                                      }}
+                                    />
+                                    <div className="flex items-center justify-between w-[100%]">
+                                      <Label htmlFor={value}>{value}</Label>
+                                      <span>
+                                        ₹{" "}
+                                        {
+                                          dish.availableCustomizations[
+                                            customization
+                                          ].values[value]
+                                        }
+                                      </span>
+                                    </div>
+                                  </div>
+                                </>
+                              );
+                            })}
+                          <Separator className="my-2" />
+                        </div>
+                      );
+                    }
+                  )}
+                </div>
+                <DrawerFooter className="flex flex-row" asChild>
+                  <Button
+                    variant="outline"
+                    className="w-[50%]"
+                    onClick={() => setShowCustomizationDrawer(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      let flag = false;
+                      Object.keys(chosenCustomization).forEach((cus) => {
+                        if (
+                          dish.availableCustomizations[[cus]].allowed === 1 &&
+                          chosenCustomization[[cus]].length !== 1
+                        ) {
+                          toast({
+                            variant: "destructive",
+                            title: "Please Fill All Required Fields",
+                            description: "Required Fields are marked with an *",
+                          });
+                          flag = true;
+                          return;
+                        }
+                      });
+                      if (flag) return;
+                      let copyOfDish = dish;
+                      copyOfDish.id = chance.guid();
+                      copyOfDish.price = dishPrice;
+                      copyOfDish.chosenCustomization = chosenCustomization;
+                      addItem(dish);
+                      setShowCustomizationDrawer(false);
+                    }}
+                    className="w-[50%] font-bold">
+                    Add |{" ₹"}
+                    {dishPrice}
+                  </Button>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
+          )}
           {dish.availableCustomizations &&
             items.filter((item) => item._id === dish._id).length > 0 && (
               <div className="absolute right-[5%] bottom-[5px]">

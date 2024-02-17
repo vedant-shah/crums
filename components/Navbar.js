@@ -158,11 +158,11 @@ function Navbar() {
               <h1 className="mb-2 font-bold">Bill Details</h1>
               <div className="flex justify-between ">
                 <h1 className="text-lg ">Items Total</h1>
-                <h1 className="text-lg ">₹ {cartTotal}</h1>
+                <h1 className="text-lg ">₹ {cartTotal.toFixed(2)}</h1>
               </div>
               <div className="flex justify-between mb-5">
                 <h1 className="text-lg ">GST</h1>
-                <h1 className="text-lg ">₹ {0.05 * cartTotal}</h1>
+                <h1 className="text-lg ">₹ {(0.05 * cartTotal).toFixed(2)}</h1>
               </div>
             </div>
             <div className="flex justify-between mb-5">

@@ -8,6 +8,18 @@ import MenuItem from "@/components/MenuItem";
 import SkeletonMenuItem from "@/components/SkeletonMenuItem";
 import { Label } from "@/components/ui/label";
 import { TbFaceIdError } from "react-icons/tb";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { RiRestaurantFill } from "react-icons/ri";
+
 function TableOrder({ params }) {
   //constants
   const Cryptr = require("cryptr");
@@ -20,6 +32,7 @@ function TableOrder({ params }) {
   const [allDishes, setAllDishes] = useState([]);
   const [vegOnly, setVegOnly] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [categoryOptions, setCategoryOptions] = useState([]);
 
   //use-effects
   useEffect(() => {
@@ -34,6 +47,14 @@ function TableOrder({ params }) {
     const response = await fetch("/api/getalldishes");
     const data = await response.json();
     setAllDishes(data.data);
+
+    let categories = [];
+    data.data.forEach((dish) => {
+      categories.push(dish.cuisine);
+    });
+    categories = new Set(categories);
+    categories = [...categories];
+    setCategoryOptions(categories);
     setLoading(false);
   };
 
@@ -41,13 +62,17 @@ function TableOrder({ params }) {
     if (vegOnly) {
       if (searchValue === "" && val.isVeg) return val;
       else if (
-        val.name.toLowerCase().includes(searchValue.toLowerCase()) &&
+        (val.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+          val.cuisine.includes(searchValue)) &&
         val.isVeg
       )
         return val;
     } else {
       if (searchValue === "") return val;
-      else if (val.name.toLowerCase().includes(searchValue.toLowerCase()))
+      else if (
+        val.name.toLowerCase().includes(searchValue.toLowerCase()) ||
+        val.cuisine.includes(searchValue)
+      )
         return val;
     }
   });
@@ -79,13 +104,44 @@ function TableOrder({ params }) {
           className="mb-4"
           placeholder="Search"
         />
-        <div className="flex items-center my-4">
-          <Switch
-            checked={vegOnly}
-            onCheckedChange={setVegOnly}
-            className="data-[state=checked]:bg-green-500 me-3 "
-          />
-          <Label>Veg Only</Label>
+        <div className="flex items-center justify-between my-4">
+          <div className="flex items-center">
+            <Switch
+              checked={vegOnly}
+              onCheckedChange={setVegOnly}
+              className="data-[state=checked]:bg-green-500 me-3 "
+            />
+            <Label>Veg Only</Label>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="">
+                <RiRestaurantFill className="text-lg me-2" /> Categories
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuRadioGroup>
+                <DropdownMenuRadioItem
+                  value=""
+                  onClick={() => {
+                    setSearchValue("");
+                  }}>
+                  All
+                </DropdownMenuRadioItem>
+                {categoryOptions.map((category) => {
+                  return (
+                    <DropdownMenuRadioItem
+                      value={category}
+                      onClick={() => {
+                        setSearchValue(category);
+                      }}>
+                      {category}
+                    </DropdownMenuRadioItem>
+                  );
+                })}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         {dishItems.length > 0 ? dishItems : !loading && displayMessage}
         {loading && (
