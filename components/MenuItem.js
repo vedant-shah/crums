@@ -38,16 +38,16 @@ function MenuItem({ dish }) {
     }
     return temp;
   });
-  console.log("showCustomizationDrawer:", showCustomizationDrawer);
-  console.log(
-    "dish.availableCustomizations &&   items.filter((item) => item._id === dish._id).length === 0:",
-    dish.availableCustomizations &&
-      items.filter((item) => item._id === dish._id).length === 0
-  );
-  const [dummyState, setDummyState] = useState(false);
+
   const addItemToCart = () => {
     dish.id = chance.guid();
     addItem(dish);
+    toast({
+      title: "Success",
+      description: "Item was successfully added to cart.",
+      duration: 1500,
+      variant: "success",
+    });
   };
 
   useEffect(() => {
@@ -61,7 +61,6 @@ function MenuItem({ dish }) {
         });
       });
       setDishPrice(customizationTotal);
-      //   console.log(customizationTotal);
     }
   }, [chosenCustomization]);
 
@@ -334,6 +333,12 @@ function MenuItem({ dish }) {
                       copyOfDish.chosenCustomization = chosenCustomization;
                       addItem(dish);
                       setShowCustomizationDrawer(false);
+                      toast({
+                        title: "Success",
+                        description: "Item was successfully added to cart.",
+                        duration: 1500,
+                        variant: "success",
+                      });
                     }}
                     className="w-[50%] font-bold">
                     Add |{" ₹"}
@@ -358,12 +363,11 @@ function MenuItem({ dish }) {
                   -
                 </Badge>
                 <Badge variant="secondary" style={{ borderRadius: "0" }}>
-                  {items.filter((item) => item._id === dish._id)[0]?.quantity}
+                  {items.filter((item) => item._id === dish._id).length}
                 </Badge>
                 <Badge
                   onClick={() => {
                     setShowCustomizationDrawer(true);
-                    setDummyState(true);
                   }}
                   style={{ borderRadius: "0 5px  5px 0" }}>
                   +

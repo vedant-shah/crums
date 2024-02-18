@@ -12,10 +12,8 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { RiRestaurantFill } from "react-icons/ri";
@@ -29,6 +27,7 @@ function TableOrder({ params }) {
 
   //states
   const [tableNo, setTableNo] = useState();
+  const [selectedCategory, setSelectedCategory] = useState("Category");
   const [allDishes, setAllDishes] = useState([]);
   const [vegOnly, setVegOnly] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -36,7 +35,8 @@ function TableOrder({ params }) {
 
   //use-effects
   useEffect(() => {
-    setTableNo(cryptr.decrypt(params.table));
+    decryptedTableNo = cryptr.decrypt(params.table);
+    setTableNo(decryptedTableNo);
     localStorage.setItem("tableNo", decryptedTableNo);
     setLoading(true);
     getAllDishes();
@@ -116,7 +116,7 @@ function TableOrder({ params }) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button className="">
-                <RiRestaurantFill className="text-lg me-2" /> Categories
+                <RiRestaurantFill className="text-lg me-2" /> {selectedCategory}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
@@ -125,6 +125,7 @@ function TableOrder({ params }) {
                   value=""
                   onClick={() => {
                     setSearchValue("");
+                    setSelectedCategory("All");
                   }}>
                   All
                 </DropdownMenuRadioItem>
@@ -134,6 +135,7 @@ function TableOrder({ params }) {
                       value={category}
                       onClick={() => {
                         setSearchValue(category);
+                        setSelectedCategory(category);
                       }}>
                       {category}
                     </DropdownMenuRadioItem>
