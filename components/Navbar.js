@@ -1,36 +1,37 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Button } from "./ui/button";
+import { useCart } from "react-use-cart";
 import { FileTextIcon } from "@radix-ui/react-icons";
 import { LuShoppingCart } from "react-icons/lu";
-import { useCart } from "react-use-cart";
+import { TbFaceId } from "react-icons/tb";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  SheetFooter,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "./ui/badge";
 import Image from "next/image";
-import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/components/ui/use-toast";
 
 function Navbar() {
+  const { toast } = useToast();
   const {
     cartTotal,
     totalItems,
     items,
     updateItemQuantity,
-    removeItem,
     setItems,
+    emptyCart,
   } = useCart();
   const [cartCount, setCartCount] = useState();
-  const [cartItemsCopy, setCartItemsCopy] = useState(items);
+  const [specialInstructions, setSpecialInstructions] = useState("");
+  const Chance = require("chance");
+  const chance = Chance();
 
   useEffect(() => {
     setCartCount(totalItems);
@@ -51,6 +52,41 @@ function Navbar() {
     let str = cus.toString().slice(0, 17) + "...";
 
     return str;
+  };
+
+  const placeOrder = async () => {
+    const order = {
+      items: items,
+      total: parseFloat(cartTotal.toFixed(2)),
+      gst: parseFloat((cartTotal * 0.05).toFixed(2)),
+      specialInstructions: specialInstructions, // Updated to use state variable
+      tableNumber: parseInt(localStorage.getItem("tableNo"), 10), // Assuming table number is stored in localStorage and converting to integer
+      orderId: chance.guid(),
+      status: "Pending",
+      created_at: new Date().toISOString(),
+      userId: chance.guid(), // Assuming there's a way to get this from the user context or similar
+    };
+
+    try {
+      const response = await fetch("/api/placeOrder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(order),
+      });
+      const data = await response.json();
+      console.log("Order placed:", data);
+      toast({
+        title: "Success",
+        description: "Order was successfully placed.",
+        duration: 2500,
+        variant: "success",
+      });
+      emptyCart();
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
   return (
     <div className="w-100 h-[10vh] flex items-center sticky p-4 justify-between top-0 z-[49] bg-[#090909]">
@@ -74,7 +110,17 @@ function Navbar() {
           <SheetHeader className="h-[10vh]" style={{ flex: "0 0 auto" }}>
             <SheetTitle className="text-3xl">Your Order</SheetTitle>
           </SheetHeader>
-          <ScrollArea className="h-[65vh]" style={{ flex: "1 1 auto" }}>
+          <ScrollArea className="" style={{ flex: "1 1 auto" }}>
+            {items.length === 0 && (
+              <>
+                <div className="flex flex-col items-center justify-center h-full">
+                  <TbFaceId className="w-16 h-16" />
+                  <h1 className="mt-2 text-lg">
+                    Let's add something to cart first, shall we?
+                  </h1>
+                </div>
+              </>
+            )}
             {items.map((dish) => {
               return (
                 <>
@@ -110,28 +156,17 @@ function Navbar() {
                     <div className="flex items-center">
                       <Badge
                         onClick={() => {
-                          updateItemQuantity(
-                            items.filter((item) => item._id === dish._id)[0].id,
-                            items.filter((item) => item._id === dish._id)[0]
-                              .quantity - 1
-                          );
+                          updateItemQuantity(dish.id, dish.quantity - 1);
                         }}
                         style={{ borderRadius: "5px 0 0 5px" }}>
                         -
                       </Badge>
                       <Badge variant="secondary" style={{ borderRadius: "0" }}>
-                        {
-                          items.filter((item) => item._id === dish._id)[0]
-                            ?.quantity
-                        }
+                        {dish.quantity.toString().padStart(2, "0")}
                       </Badge>
                       <Badge
                         onClick={() => {
-                          updateItemQuantity(
-                            items.filter((item) => item._id === dish._id)[0].id,
-                            items.filter((item) => item._id === dish._id)[0]
-                              .quantity + 1
-                          );
+                          updateItemQuantity(dish.id, dish.quantity + 1);
                         }}
                         style={{ borderRadius: "0 5px  5px 0" }}>
                         +
@@ -152,8 +187,9 @@ function Navbar() {
             <Textarea
               className="my-3"
               placeholder="Any Special Instructions?"
+              value={specialInstructions}
+              onChange={(e) => setSpecialInstructions(e.target.value)}
             />
-            {/* <Separator className="my-3" /> */}
             <div className="flex flex-col">
               <h1 className="mb-2 font-bold">Bill Details</h1>
               <div className="flex justify-between ">
@@ -168,10 +204,12 @@ function Navbar() {
             <div className="flex justify-between mb-5">
               <h1 className="text-xl font-extrabold">TO PAY</h1>
               <h1 className="text-xl font-extrabold">
-                ₹ {cartTotal + 0.05 * cartTotal}
+                ₹ {(cartTotal + 0.05 * cartTotal).toFixed(2)}
               </h1>
             </div>
-            <Button>Order</Button>
+            <Button disabled={items.length === 0} onClick={placeOrder}>
+              Order
+            </Button>
           </div>
         </SheetContent>
       </Sheet>
