@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import supabase from "../supabaseClient";
 export async function POST(req, res) {
-  const data1 = await req.json();
   const {
     items,
     total,
@@ -12,7 +11,7 @@ export async function POST(req, res) {
     status,
     created_at,
     userId,
-  } = data1;
+  } = await req.json();
   const { data, error } = await supabase.from("orders").insert({
     items,
     total,
@@ -26,7 +25,17 @@ export async function POST(req, res) {
   });
 
   if (error) {
-    return NextResponse.json({ data1, error, status: 500 });
+    return NextResponse.json({
+      success: false,
+      error,
+      message: error.message,
+      status: 500,
+    });
   }
-  return NextResponse.json({ data1, status: 200 });
+  return NextResponse.json({
+    success: true,
+    data,
+    message: "Order placed successfully",
+    status: 200,
+  });
 }
