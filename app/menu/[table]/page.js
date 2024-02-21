@@ -133,6 +133,7 @@ function TableOrder({ params }) {
                   return (
                     <DropdownMenuRadioItem
                       value={category}
+                      key={category}
                       onClick={() => {
                         setSearchValue(category);
                         setSelectedCategory(category);

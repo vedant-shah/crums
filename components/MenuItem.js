@@ -168,9 +168,9 @@ function MenuItem({ dish }) {
                   {Object.keys(dish.availableCustomizations).map(
                     (customization) => {
                       return (
-                        <div className="my-4">
+                        <div className="my-4" key={customization}>
                           <h1 className="mt-2 font-bold">
-                            {customization}{" "}
+                            {customization}
                             {dish.availableCustomizations[customization]
                               ?.allowed === 1 && "*"}
                           </h1>
@@ -190,7 +190,7 @@ function MenuItem({ dish }) {
                                   .values
                               ).map((value) => {
                                 return (
-                                  <>
+                                  <div key={value}>
                                     <div className="flex items-center my-1 space-x-2">
                                       <RadioGroupItem
                                         value={value}
@@ -225,7 +225,7 @@ function MenuItem({ dish }) {
                                         </span>
                                       </div>
                                     </div>
-                                  </>
+                                  </div>
                                 );
                               })}
                             </RadioGroup>
@@ -236,7 +236,7 @@ function MenuItem({ dish }) {
                               dish.availableCustomizations[customization].values
                             ).map((value) => {
                               return (
-                                <>
+                                <div key={value}>
                                   <div className="flex items-center my-2 space-x-2">
                                     <Checkbox
                                       value={value}
@@ -293,7 +293,7 @@ function MenuItem({ dish }) {
                                       </span>
                                     </div>
                                   </div>
-                                </>
+                                </div>
                               );
                             })}
                           <Separator className="my-2" />
