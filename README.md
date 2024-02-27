@@ -22,7 +22,7 @@ CRUMS is a cutting-edge restaurant management system that revolutionizes the din
 
 To get started with CRUMS, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/yourrepository/crums.git`
+1. Clone the repository: `git clone https://github.com/vedant-shah/crums.git`
 2. Navigate to the project directory: `cd crums`
 3. Install dependencies: `npm install`
 4. Set up your PostgreSQL database with Supabase.
