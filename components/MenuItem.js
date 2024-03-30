@@ -106,10 +106,16 @@ function MenuItem({ dish }) {
             src={dish.imgUrl}
             width={100}
             height={100}
-            className="object-cover rounded h-[100px] w-[100px]"
+            className={`object-cover rounded h-[100px] w-[100px] ${!dish.available && "filter grayscale"}`}
             alt="image"
           />
-          {!dish.availableCustomizations &&
+          {!dish.available && (
+            <Badge className="absolute right-[5%] bottom-[5px]">
+              Unavailable
+            </Badge>
+          )}
+          {dish.available &&
+            !dish.availableCustomizations &&
             items.filter((item) => item._id === dish._id).length === 0 && (
               <Button
                 onClick={addItemToCart}
@@ -147,7 +153,8 @@ function MenuItem({ dish }) {
                 </Badge>
               </div>
             )}
-          {dish.availableCustomizations &&
+          {dish.available &&
+            dish.availableCustomizations &&
             items.filter((item) => item._id === dish._id).length === 0 && (
               <Button
                 className="absolute right-[15%] bottom-[5px]"
@@ -362,7 +369,9 @@ function MenuItem({ dish }) {
                   style={{ borderRadius: "5px 0 0 5px" }}>
                   -
                 </Badge>
-                <Badge variant="secondary" style={{ borderRadius: "0" }}>
+                <Badge
+                  variant="secondary hover:disabled"
+                  style={{ borderRadius: "0" }}>
                   {items.filter((item) => item._id === dish._id).length}
                 </Badge>
                 <Badge

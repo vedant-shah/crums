@@ -10,35 +10,29 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
   Dialog,
   DialogContent,
   DialogFooter,
-  DialogDescription,
-  DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogHeader,
 } from "@/components/ui/dialog";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
+import Loader from "./ui/Loader";
 
 function Navbar() {
   const { toast } = useToast();
@@ -52,6 +46,7 @@ function Navbar() {
   } = useCart();
   const [cartCount, setCartCount] = useState();
   const [specialInstructions, setSpecialInstructions] = useState("");
+  const [loading, setLoading] = useState(false);
   const [openLoginDialogue, setOpenLoginDialogue] = useState(false);
   const [phone, setPhone] = useState("");
   const [otpPage, setOtpPage] = useState("send");
@@ -81,6 +76,7 @@ function Navbar() {
   };
   const sendOTP = async () => {
     try {
+      setLoading(true);
       const response = await fetch("/api/auth/sendOTP", {
         method: "POST",
         headers: {
@@ -92,6 +88,7 @@ function Navbar() {
       if (!data.success) {
         throw data.message;
       }
+      setLoading(false);
       toast({
         title: "Success",
         description: "OTP Sent successfully",
@@ -100,6 +97,7 @@ function Navbar() {
       });
       setOtpPage("verify");
     } catch (error) {
+      setLoading(false);
       toast({
         title: "Error",
         description: error,
@@ -110,6 +108,7 @@ function Navbar() {
   };
   const verifyOTP = async () => {
     try {
+      setLoading(true);
       const response = await fetch("/api/auth/verifyOTP", {
         method: "POST",
         headers: {
@@ -121,6 +120,7 @@ function Navbar() {
       if (!data.success) {
         throw data.message;
       }
+      setLoading(false);
       localStorage.setItem("userData", JSON.stringify(data.data));
       toast({
         title: "Success",
@@ -129,20 +129,25 @@ function Navbar() {
         variant: "success",
       });
       setOpenLoginDialogue(false);
-      placeOrder();
+      setOtpPage("send");
+      // if (items.length > 0) placeOrder();
     } catch (error) {
       console.log("error:", typeof error);
+      setLoading(false);
       toast({
         title: "Error",
         description: error,
         duration: 2500,
         variant: "destructive",
       });
+    } finally {
+      setOtp("");
     }
   };
   const placeOrder = async () => {
     if (!localStorage.getItem("userData")) {
       setOpenLoginDialogue(true);
+      setOtpPage("send");
     } else {
       const order = {
         items: items,
@@ -157,7 +162,7 @@ function Navbar() {
           ? JSON.parse(localStorage.getItem("userData")).user.id
           : null, // Retrieve userId from local storage
       };
-
+      setLoading(true);
       try {
         const response = await fetch("/api/placeOrder", {
           method: "POST",
@@ -171,6 +176,7 @@ function Navbar() {
           throw data.message;
         }
         console.log("Order placed:", data);
+        setLoading(false);
         toast({
           title: "Success",
           description: "Order was successfully placed.",
@@ -178,6 +184,7 @@ function Navbar() {
           variant: "success",
         });
         emptyCart();
+        setSpecialInstructions("");
       } catch (error) {
         console.error("Error:", error);
         toast({
@@ -199,7 +206,7 @@ function Navbar() {
       <Sheet>
         <SheetTrigger asChild>
           <div className="relative cart-button me-2" current-count={cartCount}>
-            <Button>
+            <Button className="flex items-center">
               <LuShoppingCart className="w-4 h-4 mr-2" />
               Cart
             </Button>
@@ -209,17 +216,18 @@ function Navbar() {
           onOpenAutoFocus={(e) => e.preventDefault()}
           className="flex flex-col">
           <SheetHeader
-            className="h-[10vh] text-start"
+            className="h-[15vh] flex flex-col justify-around"
             style={{ flex: "0 0 auto" }}>
             <SheetTitle className="mb-3 text-3xl">Your Order</SheetTitle>
-            {localStorage.getItem("userData") && (
+            {typeof localStorage !== "undefined" &&
+            localStorage.getItem("userData") ? (
               <>
                 Not +
-                {`${JSON.parse(localStorage.getItem("userData")).user.phone}`.substring(
+                {`${JSON.parse(localStorage.getItem("userData"))?.user?.phone}`.substring(
                   0,
                   2
                 )}{" "}
-                {`${JSON.parse(localStorage.getItem("userData")).user.phone}`.substring(
+                {`${JSON.parse(localStorage.getItem("userData"))?.user?.phone}`.substring(
                   2
                 )}{" "}
                 ?
@@ -228,6 +236,7 @@ function Navbar() {
                     className="text-blue-500 underline"
                     onClick={() => {
                       localStorage.removeItem("userData");
+                      setOtpPage("send");
                       setOpenLoginDialogue(true);
                     }}>
                     Click here
@@ -235,9 +244,23 @@ function Navbar() {
                   to change phone number
                 </span>
               </>
+            ) : (
+              <>
+                <span
+                  className="text-blue-500 underline"
+                  onClick={() => {
+                    setOpenLoginDialogue(true);
+                    setOtpPage("send");
+                  }}>
+                  Login
+                </span>{" "}
+              </>
             )}
+            <hr className="my-2" />
           </SheetHeader>
-          <ScrollArea className="" style={{ flex: "1 1 auto" }}>
+          <ScrollArea
+            className="flex items-center justify-center"
+            style={{ flex: "1 1 auto" }}>
             {items.length === 0 && (
               <>
                 <div className="flex flex-col items-center justify-center h-full">
@@ -255,10 +278,12 @@ function Navbar() {
                     <div className="w-[50%] flex">
                       <div className="h-[100%] flex items-start justify-center">
                         {dish.isVeg ? (
-                          <img
+                          <Image
                             src="https://img.icons8.com/color/480/vegetarian-food-symbol.png"
                             style={{ width: "15px", height: "15px" }}
                             className="inline-flex me-3"
+                            width={15}
+                            height={15}
                             alt=""
                           />
                         ) : (
@@ -334,7 +359,11 @@ function Navbar() {
                 ₹ {(cartTotal + 0.05 * cartTotal).toFixed(2)}
               </h1>
             </div>
-            <Button disabled={items.length === 0} onClick={placeOrder}>
+            <Button
+              disabled={items.length === 0}
+              onClick={placeOrder}
+              className="flex items-center">
+              {loading && <Loader className="w-5 h-5 " />}
               Order
             </Button>
           </div>
@@ -342,30 +371,33 @@ function Navbar() {
       </Sheet>
       <Dialog open={openLoginDialogue} onOpenChange={setOpenLoginDialogue}>
         <DialogContent className="flex flex-col items-center justify-center">
-          <DialogHeader className="flex flex-col items-center justify-center">
-            <DialogTitle>Hey, You'll have to Login to Continue</DialogTitle>
-          </DialogHeader>
-          <DialogFooter className="flex flex-col my-3 space-y-5 w-[70%]">
+          {/* <h2 className="w-[70%]">Hey, You'll have to Login to Continue</h2> */}
+          <div className="flex flex-col my-3 space-y-5 w-[70%]">
             {otpPage === "send" ? (
               <div className="flex flex-col space-y-7">
                 <h1 className="font-bold">Enter your Phone:</h1>
-                <div className="flex space-x-2">
-                  <Button className="w-10 h-10 font-bold rounded-none">
+                <div className="flex items-center ">
+                  <Button
+                    className="w-10 h-10 font-bold"
+                    style={{ borderRadius: "5px 0 0 5px" }}>
                     +91
                   </Button>
                   <Input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     value={phone}
-                    className="w-full h-10"
+                    className="w-full h-11 ms-0"
                     placeholder="Enter your 10 digit phone number"
                     onChange={(e) => {
-                      if (e.target.value.toString().length <= 10) {
-                        setPhone(e.target.value);
-                      }
+                      setPhone(e.target.value);
                     }}
                   />
                 </div>
-                <Button disabled={phone.length !== 10} onClick={sendOTP}>
+                <Button
+                  disabled={phone.length !== 10}
+                  onClick={sendOTP}
+                  className="flex items-center">
+                  {loading && <Loader className="w-5 h-5 " />}
                   Send Otp
                 </Button>
               </div>
@@ -373,7 +405,7 @@ function Navbar() {
               <div className="flex flex-col space-y-5">
                 <h1 className="font-bold">Verify OTP</h1>
                 <h1>
-                  Not {phone} ?{" "}
+                  Not {phone} ? <br />
                   <span
                     className="text-blue-500 underline"
                     onClick={() => setOtpPage("send")}>
@@ -381,23 +413,37 @@ function Navbar() {
                   </span>{" "}
                   to change Phone number
                 </h1>
-                <Input
-                  type="number"
+                <InputOTP
+                  maxLength={6}
                   value={otp}
-                  className="w-full h-10"
-                  placeholder="Enter your 6 digit OTP"
+                  className="w-full"
                   onChange={(e) => {
-                    if (e.target.value.toString().length <= 6) {
-                      setOtp(e.target.value);
-                    }
+                    setOtp(e);
                   }}
-                />
-                <Button disabled={otp.length !== 6} onClick={verifyOTP}>
-                  Verify Otp
-                </Button>
+                  onComplete={() => {
+                    verifyOTP();
+                  }}>
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                  </InputOTPGroup>
+                  <InputOTPSeparator />
+                  <InputOTPGroup>
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
+                <p>
+                  Didn't receive OTP?{" "}
+                  <span className="text-blue-500 underline" onClick={sendOTP}>
+                    Resend
+                  </span>
+                </p>
               </div>
             )}
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
