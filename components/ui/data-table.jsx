@@ -23,7 +23,7 @@ import {
 function DataTable({
     columns,
     data,
-    searchColumn
+    searchColumn,
 }) {
 
     const [columnFilters, setColumnFilters] = useState([])
@@ -36,7 +36,7 @@ function DataTable({
         getPaginationRowModel: getPaginationRowModel(),
         state: {
             columnFilters: columnFilters,
-        },
+        }
     });
 
     return (
