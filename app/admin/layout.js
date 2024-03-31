@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import {
   Bell,
@@ -11,16 +12,8 @@ import {
   ShoppingCart,
   Users,
 } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,8 +24,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { usePathname } from "next/navigation";
 
-function Dashboard() {
+function Dashboard({ children }) {
+  const pathname = usePathname().substring(7);
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
@@ -40,7 +35,7 @@ function Dashboard() {
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <Package2 className="w-6 h-6" />
-              <span className="">Acme Inc</span>
+              <span className="">CRUMS</span>
             </Link>
             <Button variant="outline" size="icon" className="w-8 h-8 ml-auto">
               <Bell className="w-4 h-4" />
@@ -50,14 +45,14 @@ function Dashboard() {
           <div className="flex-1">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
               <Link
-                href="#"
-                className="flex items-center gap-3 px-3 py-2 transition-all rounded-lg text-muted-foreground hover:text-primary">
+                href="/admin/dashboard"
+                className={`flex items-center gap-3 px-3 py-2 ${pathname === "dashboard" ? "bg-muted text-primary" : "text-muted-foreground"} transition-all rounded-lg  hover:text-primary`}>
                 <Home className="w-4 h-4" />
                 Dashboard
               </Link>
               <Link
-                href="#"
-                className="flex items-center gap-3 px-3 py-2 transition-all rounded-lg text-muted-foreground hover:text-primary">
+                href="/admin/orders"
+                className={`flex items-center gap-3 px-3 py-2 transition-all rounded-lg ${pathname === "orders" ? "bg-muted text-primary" : "text-muted-foreground"} hover:text-primary`}>
                 <ShoppingCart className="w-4 h-4" />
                 Orders
                 <Badge className="flex items-center justify-center w-6 h-6 ml-auto rounded-full shrink-0">
@@ -65,40 +60,18 @@ function Dashboard() {
                 </Badge>
               </Link>
               <Link
-                href="#"
-                className="flex items-center gap-3 px-3 py-2 transition-all rounded-lg bg-muted text-primary hover:text-primary">
+                href="/admin/dishes"
+                className={`flex items-center gap-3 px-3 py-2 transition-all rounded-lg ${pathname === "dishes" ? "bg-muted text-primary" : "text-muted-foreground"} hover:text-primary`}>
                 <Package className="w-4 h-4" />
-                Products{" "}
+                Dishes{" "}
               </Link>
               <Link
-                href="#"
-                className="flex items-center gap-3 px-3 py-2 transition-all rounded-lg text-muted-foreground hover:text-primary">
+                href="/admin/customers"
+                className={`flex items-center gap-3 px-3 py-2 transition-all rounded-lg ${pathname === "customers" ? "bg-muted text-primary" : "text-muted-foreground"} hover:text-primary`}>
                 <Users className="w-4 h-4" />
                 Customers
               </Link>
-              <Link
-                href="#"
-                className="flex items-center gap-3 px-3 py-2 transition-all rounded-lg text-muted-foreground hover:text-primary">
-                <LineChart className="w-4 h-4" />
-                Analytics
-              </Link>
             </nav>
-          </div>
-          <div className="p-4 mt-auto">
-            <Card>
-              <CardHeader className="p-2 pt-0 md:p-4">
-                <CardTitle>Upgrade to Pro</CardTitle>
-                <CardDescription>
-                  Unlock all features and get unlimited access to our support
-                  team.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
-                <Button size="sm" className="w-full">
-                  Upgrade
-                </Button>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
@@ -120,10 +93,10 @@ function Dashboard() {
                   href="#"
                   className="flex items-center gap-2 text-lg font-semibold">
                   <Package2 className="w-6 h-6" />
-                  <span className="sr-only">Acme Inc</span>
+                  <span className="sr-only">CRUMS</span>
                 </Link>
                 <Link
-                  href="#"
+                  href="/dashboard"
                   className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground">
                   <Home className="w-5 h-5" />
                   Dashboard
@@ -156,22 +129,6 @@ function Dashboard() {
                   Analytics
                 </Link>
               </nav>
-              <div className="mt-auto">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Upgrade to Pro</CardTitle>
-                    <CardDescription>
-                      Unlock all features and get unlimited access to our
-                      support team.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button size="sm" className="w-full">
-                      Upgrade
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
             </SheetContent>
           </Sheet>
           <div className="flex-1 w-full">
@@ -203,22 +160,7 @@ function Dashboard() {
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
-        <main className="flex flex-col flex-1 gap-4 p-4 lg:gap-6 lg:p-6">
-          <div className="flex items-center">
-            <h1 className="text-lg font-semibold md:text-2xl">Inventory</h1>
-          </div>
-          <div className="flex items-center justify-center flex-1 border border-dashed rounded-lg shadow-sm">
-            <div className="flex flex-col items-center gap-1 text-center">
-              <h3 className="text-2xl font-bold tracking-tight">
-                You have no products
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                You can start selling as soon as you add a product.
-              </p>
-              <Button className="mt-4">Add Product</Button>
-            </div>
-          </div>
-        </main>
+        {children}
       </div>
     </div>
   );

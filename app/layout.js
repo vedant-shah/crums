@@ -2,8 +2,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import Navbar from "@/components/Navbar";
-import { CartProvider } from "react-use-cart";
 import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -22,11 +20,8 @@ export default function RootLayout({ children }) {
           defaultTheme="dark"
           enableSystem
           disableTransitionOnChange>
-          <CartProvider>
-            <Navbar />
-            <Toaster />
-            {children}
-          </CartProvider>
+          <Toaster />
+          {children}
         </ThemeProvider>
       </body>
     </html>
