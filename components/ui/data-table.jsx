@@ -1,9 +1,7 @@
 "use client";
 import { useState } from "react";
 import {
-    ColumnDef,
     flexRender,
-    ColumnFiltersState,
     getFilteredRowModel,
     getCoreRowModel,
     getPaginationRowModel,
