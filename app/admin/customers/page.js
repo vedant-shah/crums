@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import DataTable from "@/components/ui/data-table";
 import { columns } from "./columns";
 import { useToast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
+
 function Customers() {
   const [data, setData] = useState([]);
   const { toast } = useToast();

@@ -89,14 +89,16 @@ function MenuItem({ dish }) {
               )}
               <div className="flex items-center">
                 <HiFire className="text-orange-600" />
-                <span className="font-light leading-none text-[0.5rem]">
+                <h3 className="font-light leading-none tracking-tight ">
                   {dish.calories} KCal
-                </span>
+                </h3>
               </div>
             </div>
             {dish.name}
           </CardTitle>
-          <CardDescription>₹ {dish.price}</CardDescription>
+          <CardDescription className="font-medium leading-none tracking-tight">
+            ₹ {dish.price}
+          </CardDescription>
           <CardDescription className="mt-3 text-start">
             {dish.description}
           </CardDescription>
@@ -206,6 +208,7 @@ function MenuItem({ dish }) {
                                         ]?.includes(value)}
                                         id="r1"
                                         onClick={(e) => {
+                                          if (!e.target.value) return;
                                           let temp =
                                             chosenCustomization[
                                               [customization]

@@ -7,7 +7,6 @@ export async function GET(req, res) {
     error,
   } = await supabase.auth.admin.listUsers();
 
-  console.log("data:", users);
   if (error) {
     return NextResponse.json(
       { message: error.message, success: false },

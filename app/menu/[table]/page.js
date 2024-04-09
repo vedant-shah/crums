@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-
+import { useCart } from "react-use-cart";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 
@@ -32,6 +32,7 @@ function TableOrder({ params }) {
   const [vegOnly, setVegOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [categoryOptions, setCategoryOptions] = useState([]);
+  const { removeItem, items } = useCart();
 
   //use-effects
   useEffect(() => {
@@ -40,6 +41,20 @@ function TableOrder({ params }) {
     localStorage.setItem("tableNo", decryptedTableNo);
     setLoading(true);
     getAllDishes();
+
+    items.forEach((item) => {
+      if (
+        item.tableNo !== decryptedTableNo ||
+        allDishes.filter((dish) => dish.available === false).includes(item)
+      ) {
+        console.log(
+          "removing item",
+          item.name,
+          "from cart as it is not available"
+        );
+        removeItem(item.id);
+      }
+    });
   }, []);
 
   //functions
@@ -86,8 +101,7 @@ function TableOrder({ params }) {
       <TbFaceIdError className="text-9xl" />
 
       <h1 className="my-3 text-xl text-center">
-        Uh Oh! <br /> Looks like there are No items to display. <br /> Kindly
-        vary search parameters!
+        Uh Oh! <br /> Looks like there are no items to display at the moment.
       </h1>
     </div>
   );
