@@ -57,7 +57,7 @@ function Dashboard() {
   };
 
   return (
-    <main className="flex flex-col flex-1 gap-4 p-4 md:gap-8 md:p-8">
+    <main className="flex flex-col flex-1 gap-4 p-4 overflow-y-auto md:gap-8 md:p-8">
       <div className="grid gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -173,7 +173,7 @@ function Dashboard() {
         </Card>
       </div>
       <div className="flex w-full h-full">
-        <ResponsiveContainer width="50%" height="100%">
+        <ResponsiveContainer width="50%" height="90%">
           <LineChart width={300} height={300} data={analyticsData?.monthlyData}>
             {/* <CartesianGrid strokeDasharray="3 3" /> */}
             <XAxis dataKey="month" />
@@ -188,13 +188,13 @@ function Dashboard() {
             />
           </LineChart>
         </ResponsiveContainer>
-        <ResponsiveContainer width="50%" height="100%">
+        <ResponsiveContainer width="50%" height="90%">
           <BarChart width={500} height={300} data={analyticsData?.monthlyData}>
             <XAxis dataKey="month" />
             <Legend />
             <YAxis />
             {/* <Tooltip /> */}
-            <Bar dataKey="revenue" fill="#8884d8" />
+            <Bar dataKey="revenue" fill="#abfb1a" />
           </BarChart>
         </ResponsiveContainer>
       </div>

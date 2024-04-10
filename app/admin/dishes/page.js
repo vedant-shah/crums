@@ -5,11 +5,42 @@ import Image from "next/image";
 import { Switch } from "@/components/ui/switch";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Steps, StepsItem, StepsCompleted } from "@saas-ui/react";
+
+import { TbPlus } from "react-icons/tb";
 
 function Customers() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const [step, setStep] = useState(0);
+  const steps = [
+    {
+      name: "step 1",
+      title: "First step",
+      children: <div py="4">Content step 1</div>,
+    },
+    {
+      name: "step 2",
+      title: "Second step",
+      children: <div py="4">Content step 2</div>,
+    },
+    {
+      name: "step 3",
+      title: "Third step",
+      children: <div py="4">Content step 3</div>,
+    },
+  ];
+
+  const { toast } = useToast;
 
   useEffect(() => {
     getAllDishes();
@@ -150,7 +181,32 @@ function Customers() {
   return (
     <>
       <div className="container my-5">
-        <h1 className="mb-4 text-2xl font-semibold">Dishes</h1>
+        <div className="flex justify-between">
+          <h1 className="mb-4 text-2xl font-semibold">Dishes</h1>
+          {!loading && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="flex items-center">
+                  <TbPlus />
+                  New Dish
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <div>
+                  <Steps step={step} mb="2">
+                    {steps.map((args, i) => (
+                      <StepsItem key={i} {...args} />
+                    ))}
+                    <StepsCompleted py="4">Completed</StepsCompleted>
+                  </Steps>
+                </div>
+                <DialogHeader>
+                  <DialogTitle>Add a New Dish</DialogTitle>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
         {loading && (
           <div className="flex items-center w-full h-16">
             <Loader2 className="w-full animate-spin" />
