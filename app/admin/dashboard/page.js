@@ -141,7 +141,7 @@ function Dashboard() {
               </TableHeader>
               <TableBody>
                 {analyticsData?.recentOrders?.map((order) => (
-                  <TableRow>
+                  <TableRow key={order.id}>
                     <TableCell>
                       <div className="font-medium">{order.orderId}</div>
                       <div className="hidden text-sm text-muted-foreground md:inline">
@@ -173,7 +173,7 @@ function Dashboard() {
         </Card>
       </div>
       <div className="flex w-full h-full">
-        <ResponsiveContainer width="50%" height="90%">
+        <ResponsiveContainer width="50%" height="95%">
           <LineChart width={300} height={300} data={analyticsData?.monthlyData}>
             {/* <CartesianGrid strokeDasharray="3 3" /> */}
             <XAxis dataKey="month" />
@@ -188,7 +188,7 @@ function Dashboard() {
             />
           </LineChart>
         </ResponsiveContainer>
-        <ResponsiveContainer width="50%" height="90%">
+        <ResponsiveContainer width="50%" height="95%">
           <BarChart width={500} height={300} data={analyticsData?.monthlyData}>
             <XAxis dataKey="month" />
             <Legend />
