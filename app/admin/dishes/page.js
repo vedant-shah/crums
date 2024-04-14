@@ -6,6 +6,18 @@ import { Switch } from "@/components/ui/switch";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
   Dialog,
   DialogContent,
@@ -14,33 +26,71 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Steps, StepsItem, StepsCompleted } from "@saas-ui/react";
 
 import { TbPlus } from "react-icons/tb";
 
 function Customers() {
+  const { toast } = useToast();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [step, setStep] = useState(0);
-  const steps = [
-    {
-      name: "step 1",
-      title: "First step",
-      children: <div py="4">Content step 1</div>,
-    },
-    {
-      name: "step 2",
-      title: "Second step",
-      children: <div py="4">Content step 2</div>,
-    },
-    {
-      name: "step 3",
-      title: "Third step",
-      children: <div py="4">Content step 3</div>,
-    },
-  ];
+  const [isEditing, setIsEditing] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    course: "",
+    cuisine: "",
+    calories: "",
+    price: "",
+    cookTime: "",
+    imgUrl: "",
+    available: false,
+    isVeg: false,
+  });
 
-  const { toast } = useToast;
+  const handleUpdateDish = async () => {
+    try {
+      const response = await fetch("/api/admin/updatedish", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      if (!data.success) {
+        throw data.message;
+      }
+      toast({
+        title: "Success",
+        description: data.message,
+        variant: "success",
+        duration: 1500,
+      });
+      setFormData({
+        name: "",
+        description: "",
+        course: "",
+        cuisine: "",
+        calories: "",
+        price: "",
+        cookTime: "",
+        imgUrl: "",
+        available: false,
+        isVeg: false,
+      });
+      setOpen(false);
+      getAllDishes();
+    } catch (err) {
+      console.log(err);
+      toast({
+        title: "Error",
+        description: err,
+        variant: "error",
+        duration: 1500,
+      });
+    }
+  };
 
   useEffect(() => {
     getAllDishes();
@@ -142,6 +192,36 @@ function Customers() {
         );
       },
     },
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }) => {
+        const dish = row.original;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <DotsHorizontalIcon className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => {
+                  setFormData(dish);
+                  setIsEditing(true);
+                  setOpen(true);
+                }}
+              >
+                Edit
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
   ];
 
   async function handleCheckChange(id, updatedValue) {
@@ -178,31 +258,199 @@ function Customers() {
     }
   }
 
+  const inputFields = [
+    {
+      name: "name",
+      label: "Name",
+      type: "text",
+      placeholder: "Enter the name of the dish",
+    },
+    {
+      name: "description",
+      label: "Description",
+      type: "text",
+      placeholder: "Enter the description of the dish",
+    },
+    {
+      name: "course",
+      label: "Course",
+      type: "text",
+      placeholder: "Enter the course of the dish",
+    },
+    {
+      name: "cuisine",
+      label: "Cuisine",
+      type: "text",
+      placeholder: "Enter the cuisine of the dish",
+    },
+    {
+      name: "calories",
+      label: "Calories",
+      type: "number",
+      placeholder: "Enter the calories of the dish",
+    },
+    {
+      name: "price",
+      label: "Price",
+      type: "number",
+      placeholder: "Enter the price of the dish",
+    },
+    {
+      name: "cookTime",
+      label: "Cooking Time",
+      type: "number",
+      placeholder: "Enter the cooking time of the dish",
+    },
+    {
+      name: "imgUrl",
+      label: "Image URL",
+      type: "text",
+      placeholder: "Enter the image URL of the dish",
+    },
+    {
+      name: "available",
+      label: "Available",
+      type: "checkbox",
+      placeholder: "Is the dish available?",
+    },
+    {
+      name: "isVeg",
+      label: "Is Veg",
+      type: "checkbox",
+      placeholder: "Is the dish vegetarian?",
+    },
+  ];
+
+  const addNewDish = async (e) => {
+    e.preventDefault();
+    console.log(formData);
+
+    try {
+      const response = await fetch("/api/admin/addNewDish", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      if (!data.success) {
+        throw data.message;
+      }
+      toast({
+        title: "Success",
+        description: data.message,
+        variant: "success",
+        duration: 1500,
+      });
+      setFormData({
+        name: "",
+        description: "",
+        course: "",
+        cuisine: "",
+        calories: "",
+        price: "",
+        cookTime: "",
+        imgUrl: "",
+        available: false,
+        isVeg: false,
+      });
+      setOpen(false);
+      getAllDishes();
+    } catch (err) {
+      console.log(err);
+      toast({
+        title: "Error",
+        description: err,
+        variant: "error",
+        duration: 1500,
+      });
+    }
+  };
   return (
     <>
       <div className="container my-5">
         <div className="flex justify-between">
           <h1 className="mb-4 text-2xl font-semibold">Dishes</h1>
           {!loading && (
-            <Dialog>
+            <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button className="flex items-center">
                   <TbPlus />
                   New Dish
                 </Button>
               </DialogTrigger>
-              <DialogContent>
-                <div>
-                  <Steps step={step} mb="2">
-                    {steps.map((args, i) => (
-                      <StepsItem key={i} {...args} />
-                    ))}
-                    <StepsCompleted py="4">Completed</StepsCompleted>
-                  </Steps>
-                </div>
+              <DialogContent
+                style={{
+                  minWidth: "50vw",
+                  minHeight: "60vh",
+                }}
+              >
                 <DialogHeader>
-                  <DialogTitle>Add a New Dish</DialogTitle>
+                  <DialogTitle>
+                    {isEditing ? "Edit Dish" : "Add  a New Dish"}
+                  </DialogTitle>
                 </DialogHeader>
+
+                <form onSubmit={addNewDish}>
+                  <div className="grid grid-cols-2 gap-4">
+                    {inputFields.map((field) => (
+                      <div key={field.name}>
+                        {field.type === "checkbox" ? (
+                          <div className="flex items-center">
+                            <Checkbox
+                              id={field.name}
+                              checked={formData[field.name]}
+                              onClick={(e) => {
+                                console.log();
+                                setFormData({
+                                  ...formData,
+                                  [field.name]:
+                                    e.target.getAttribute("data-state") ===
+                                    "checked"
+                                      ? false
+                                      : true,
+                                });
+                              }}
+                            />
+                            <label
+                              htmlFor={field.name}
+                              className="text-sm ms-3 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                              {field.placeholder}
+                            </label>
+                          </div>
+                        ) : (
+                          <>
+                            <label htmlFor={field.name}>{field.label}</label>
+                            <Input
+                              type={field.type}
+                              name={field.name}
+                              value={formData[field.name]}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  [field.name]: e.target.value,
+                                })
+                              }
+                              id={field.name}
+                              placeholder={field.placeholder}
+                            />
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-end mt-4">
+                    {isEditing ? (
+                      <Button type="button" onClick={handleUpdateDish}>
+                        Update Dish
+                      </Button>
+                    ) : (
+                      <Button type="submit">Add Dish</Button>
+                    )}
+                  </div>
+                </form>
               </DialogContent>
             </Dialog>
           )}
