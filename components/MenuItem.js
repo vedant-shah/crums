@@ -121,7 +121,8 @@ function MenuItem({ dish }) {
             items.filter((item) => item._id === dish._id).length === 0 && (
               <Button
                 onClick={addItemToCart}
-                className="absolute right-[15%] bottom-[5px]">
+                className="absolute right-[15%] bottom-[5px]"
+              >
                 Add
               </Button>
             )}
@@ -136,10 +137,14 @@ function MenuItem({ dish }) {
                         .quantity - 1
                     );
                   }}
-                  style={{ borderRadius: "5px 0 0 5px" }}>
+                  style={{ borderRadius: "5px 0 0 5px" }}
+                >
                   -
                 </Badge>
-                <Badge variant="secondary" style={{ borderRadius: "0" }}>
+                <Badge
+                  variant="secondary"
+                  style={{ borderRadius: "0", backgroundColor: "black" }}
+                >
                   {items.filter((item) => item._id === dish._id)[0]?.quantity}
                 </Badge>
                 <Badge
@@ -150,7 +155,8 @@ function MenuItem({ dish }) {
                         .quantity + 1
                     );
                   }}
-                  style={{ borderRadius: "0 5px  5px 0" }}>
+                  style={{ borderRadius: "0 5px  5px 0" }}
+                >
                   +
                 </Badge>
               </div>
@@ -160,7 +166,8 @@ function MenuItem({ dish }) {
             items.filter((item) => item._id === dish._id).length === 0 && (
               <Button
                 className="absolute right-[15%] bottom-[5px]"
-                onClick={() => setShowCustomizationDrawer(true)}>
+                onClick={() => setShowCustomizationDrawer(true)}
+              >
                 Add
               </Button>
             )}
@@ -316,7 +323,8 @@ function MenuItem({ dish }) {
                   <Button
                     variant="outline"
                     className="w-[50%]"
-                    onClick={() => setShowCustomizationDrawer(false)}>
+                    onClick={() => setShowCustomizationDrawer(false)}
+                  >
                     Cancel
                   </Button>
                   <Button
@@ -350,7 +358,8 @@ function MenuItem({ dish }) {
                         variant: "success",
                       });
                     }}
-                    className="w-[50%] font-bold">
+                    className="w-[50%] font-bold"
+                  >
                     Add |{" ₹"}
                     {dishPrice}
                   </Button>
@@ -369,19 +378,22 @@ function MenuItem({ dish }) {
                         .quantity - 1
                     );
                   }}
-                  style={{ borderRadius: "5px 0 0 5px" }}>
+                  style={{ borderRadius: "5px 0 0 5px" }}
+                >
                   -
                 </Badge>
                 <Badge
                   variant="secondary hover:disabled"
-                  style={{ borderRadius: "0" }}>
+                  style={{ borderRadius: "0", backgroundColor: "black" }}
+                >
                   {items.filter((item) => item._id === dish._id).length}
                 </Badge>
                 <Badge
                   onClick={() => {
                     setShowCustomizationDrawer(true);
                   }}
-                  style={{ borderRadius: "0 5px  5px 0" }}>
+                  style={{ borderRadius: "0 5px  5px 0" }}
+                >
                   +
                 </Badge>
               </div>
