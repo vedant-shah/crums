@@ -18,23 +18,19 @@ import {
     TableRow,
 } from "@/components/ui/table";
 
-function DataTable({
-    columns,
-    data,
-    searchColumn,
-}) {
-
-    const [columnFilters, setColumnFilters] = useState([])
+function DataTable({ columns, data, searchColumn, disablePagination = false }) {
+    const [columnFilters, setColumnFilters] = useState([]);
     const table = useReactTable({
         data,
         columns,
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
+        getPaginationRowModel: !disablePagination && getPaginationRowModel(),
+
         state: {
             columnFilters: columnFilters,
-        }
+        },
     });
 
     return (
@@ -42,7 +38,7 @@ function DataTable({
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Search..."
-                    value={(table.getColumn(searchColumn)?.getFilterValue()) ?? ""}
+                    value={table.getColumn(searchColumn)?.getFilterValue() ?? ""}
                     onChange={(event) =>
                         table.getColumn(searchColumn)?.setFilterValue(event.target.value)
                     }
@@ -53,10 +49,10 @@ function DataTable({
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
+                            <TableRow key={headerGroup.id} >
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id}>
+                                        <TableHead style={{ width: header.getSize() }} key={header.id}>
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
@@ -77,15 +73,21 @@ function DataTable({
                                     data-state={row.getIsSelected() && "selected"}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        <TableCell style={{ width: cell.column.getSize() }} key={cell.id}>
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
                                         </TableCell>
                                     ))}
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="h-24 text-center"
+                                >
                                     No results.
                                 </TableCell>
                             </TableRow>
@@ -93,24 +95,26 @@ function DataTable({
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center justify-end py-4 space-x-2">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    Previous
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    Next
-                </Button>
-            </div>
+            {!disablePagination && (
+                <div className="flex items-center justify-end py-4 space-x-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
+                    >
+                        Previous
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => table.nextPage()}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        Next
+                    </Button>
+                </div>
+            )}
         </>
     );
 }

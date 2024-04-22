@@ -121,6 +121,7 @@ function Customers() {
     {
       accessorKey: "isVeg",
       header: "",
+      size: 50,
       cell: ({ row }) => (
         <div className="flex justify-center">
           {row.getValue("isVeg") ? (
@@ -146,6 +147,23 @@ function Customers() {
       ),
     },
     {
+      accessorKey: "imgUrl",
+      header: "Image",
+      size: 60,
+      cell: ({ row }) => (
+        <div className="flex justify-center">
+          <Image
+            src={row.getValue("imgUrl")}
+            style={{ width: "50px", height: "50px" }}
+            className="inline-flex me-3"
+            width={50}
+            height={50}
+            alt=""
+          />
+        </div>
+      ),
+    },
+    {
       accessorKey: "name",
       header: "Name",
     },
@@ -161,6 +179,7 @@ function Customers() {
     {
       accessorKey: "course",
       header: "Course",
+      size: 100,
     },
     {
       accessorKey: "cuisine",
@@ -201,9 +220,9 @@ function Customers() {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button variant="ghost" className="w-8 h-8 p-0">
                 <span className="sr-only">Open menu</span>
-                <DotsHorizontalIcon className="h-4 w-4" />
+                <DotsHorizontalIcon className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -213,8 +232,7 @@ function Customers() {
                   setFormData(dish);
                   setIsEditing(true);
                   setOpen(true);
-                }}
-              >
+                }}>
                 Edit
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -384,8 +402,7 @@ function Customers() {
                 style={{
                   minWidth: "50vw",
                   minHeight: "60vh",
-                }}
-              >
+                }}>
                 <DialogHeader>
                   <DialogTitle>
                     {isEditing ? "Edit Dish" : "Add  a New Dish"}
@@ -415,8 +432,7 @@ function Customers() {
                             />
                             <label
                               htmlFor={field.name}
-                              className="text-sm ms-3 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                            >
+                              className="text-sm font-medium leading-none ms-3 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                               {field.placeholder}
                             </label>
                           </div>
@@ -426,6 +442,7 @@ function Customers() {
                             <Input
                               type={field.type}
                               name={field.name}
+                              required
                               value={formData[field.name]}
                               onChange={(e) =>
                                 setFormData({

@@ -41,6 +41,7 @@ function MenuItem({ dish }) {
 
   const addItemToCart = () => {
     dish.id = chance.guid();
+    dish.status = "Pending";
     addItem(dish);
     toast({
       title: "Success",
@@ -139,7 +140,9 @@ function MenuItem({ dish }) {
                   style={{ borderRadius: "5px 0 0 5px" }}>
                   -
                 </Badge>
-                <Badge variant="secondary" style={{ borderRadius: "0" }}>
+                <Badge
+                  variant="secondary"
+                  style={{ borderRadius: "0", backgroundColor: "black" }}>
                   {items.filter((item) => item._id === dish._id)[0]?.quantity}
                 </Badge>
                 <Badge
@@ -341,6 +344,7 @@ function MenuItem({ dish }) {
                       copyOfDish.id = chance.guid();
                       copyOfDish.price = dishPrice;
                       copyOfDish.chosenCustomization = chosenCustomization;
+                      copyOfDish.status = "Pending";
                       addItem(dish);
                       setShowCustomizationDrawer(false);
                       toast({
@@ -374,7 +378,7 @@ function MenuItem({ dish }) {
                 </Badge>
                 <Badge
                   variant="secondary hover:disabled"
-                  style={{ borderRadius: "0" }}>
+                  style={{ borderRadius: "0", backgroundColor: "black" }}>
                   {items.filter((item) => item._id === dish._id).length}
                 </Badge>
                 <Badge
