@@ -51,6 +51,7 @@ function Navbar() {
   const [phone, setPhone] = useState("");
   const [otpPage, setOtpPage] = useState("send");
   const [otp, setOtp] = useState("");
+  const [runningOrders, setRunningOrders] = useState();
   const Chance = require("chance");
   const chance = Chance();
 
@@ -59,11 +60,81 @@ function Navbar() {
   }, [items]);
 
   useEffect(() => {
+    getRunningBill();
+  }, []);
+
+  useEffect(() => {
     const courseOrder = { starter: 0, main: 1, deserts: 2 };
     let temp = items;
     temp.sort((a, b) => courseOrder[a.course] - courseOrder[b.course]);
     setItems(temp);
   }, []);
+
+  const requestBill = async () => {
+    const confirm = window.confirm("Are you sure you want to request bill?");
+    if (!confirm) return;
+
+    try {
+      setLoading(true);
+      const response = await fetch("/api/requestbill", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tableNumber: parseInt(localStorage.getItem("tableNo"), 10),
+        }),
+      });
+      const data = await response.json();
+      if (!data.success) {
+        throw data.message;
+      }
+      getRunningBill();
+      setLoading(false);
+      toast({
+        title: "Success",
+        description: "Bill Requested successfully",
+        duration: 2500,
+        variant: "success",
+      });
+    } catch (error) {
+      setLoading(false);
+      console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: error,
+        duration: 2500,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getRunningBill = async () => {
+    try {
+      const response = await fetch(
+        `/api/runningorders/${localStorage.getItem("tableNo")}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+      if (!data.success) {
+        throw data.message;
+      }
+      setRunningOrders(data.data);
+    } catch (error) {
+      console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: error,
+        duration: 2500,
+        variant: "destructive",
+      });
+    }
+  };
 
   const getCurrentCustomizations = (dish) => {
     let cus = [];
@@ -198,11 +269,117 @@ function Navbar() {
   };
   return (
     <div className="w-100 h-[10vh] flex items-center sticky p-4 justify-between top-0 z-[49] bg-[#090909]">
-      <Button variant="secondary">
-        <FileTextIcon className="w-4 h-4 mr-2" />
-        Bill
-      </Button>
+      <Sheet>
+        <SheetTrigger asChild>
+          <div className="relative me-2">
+            <Button variant="secondary">
+              <FileTextIcon className="w-4 h-4 mr-2" />
+              Bill: ₹{" "}
+              {runningOrders?.grandTotal + runningOrders?.grandTotalGst || 0}
+            </Button>
+          </div>
+        </SheetTrigger>
+        <SheetContent
+          side="left"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          className="flex flex-col">
+          <SheetHeader
+            className="h-[15vh] flex flex-col justify-around"
+            style={{ flex: "0 0 auto" }}>
+            <SheetTitle className="mb-3 text-3xl">
+              Your Current Orders
+            </SheetTitle>
 
+            <hr className="my-2" />
+          </SheetHeader>
+          <ScrollArea
+            className="flex items-center justify-center"
+            style={{ flex: "1 1 auto" }}>
+            {runningOrders?.allItems?.length === 0 && (
+              <>
+                <div className="flex flex-col items-center justify-center h-full">
+                  <TbFaceId className="w-16 h-16" />
+                  <h1 className="mt-2 text-lg">
+                    Oops! There's nothing here to see.
+                  </h1>
+                </div>
+              </>
+            )}
+            {runningOrders?.allItems.map((dish) => {
+              return (
+                <>
+                  <div className="flex justify-between mb-10">
+                    <div className="w-[50%] flex">
+                      <div className="h-[100%] flex items-center justify-center">
+                        {dish.isVeg ? (
+                          <Image
+                            src="https://img.icons8.com/color/480/vegetarian-food-symbol.png"
+                            style={{ width: "15px", height: "15px" }}
+                            className="inline-flex me-3"
+                            width={15}
+                            height={15}
+                            alt=""
+                          />
+                        ) : (
+                          <Image
+                            src="/non-veg.png"
+                            style={{ width: "15px", height: "15px" }}
+                            className="inline-flex me-3"
+                            width={15}
+                            height={15}
+                            alt=""
+                          />
+                        )}
+                      </div>
+                      <div>
+                        <h1 className="inline-flex ">{dish.name}</h1>
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <Badge variant="secondary" style={{ borderRadius: "0" }}>
+                        x{dish.quantity}
+                      </Badge>
+                    </div>
+                    <h3 className="flex items-center">
+                      ₹ {dish.itemTotal.toFixed(2)}
+                    </h3>
+                  </div>
+                </>
+              );
+            })}
+          </ScrollArea>
+          <div
+            className="flex flex-col justify-end "
+            style={{ flex: "0 0 auto" }}>
+            <div className="flex flex-col">
+              <h1 className="mb-2 font-bold">Bill Details</h1>
+              <div className="flex justify-between ">
+                <h1 className="text-lg ">Items Total</h1>
+                <h1 className="text-lg ">
+                  ₹ {runningOrders?.grandTotal.toFixed(2)}
+                </h1>
+              </div>
+              <div className="flex justify-between mb-5">
+                <h1 className="text-lg ">GST</h1>
+                <h1 className="text-lg ">₹ {runningOrders?.grandTotalGst}</h1>
+              </div>
+            </div>
+            <div className="flex justify-between mb-5">
+              <h1 className="text-xl font-extrabold">TO PAY</h1>
+              <h1 className="text-xl font-extrabold">
+                ₹ {runningOrders?.grandTotal + runningOrders?.grandTotalGst}
+              </h1>
+            </div>
+            <Button
+              disabled={loading || runningOrders?.allItems.length === 0}
+              onClick={requestBill}
+              className="flex items-center">
+              {loading && <Loader className="w-5 h-5 " />}
+              Request Bill
+            </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
       <Sheet>
         <SheetTrigger asChild>
           <div className="relative cart-button me-2" current-count={cartCount}>

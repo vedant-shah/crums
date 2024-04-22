@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Input from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import supabase from "./supabaseClient";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import dayjs from "dayjs";
@@ -80,7 +81,6 @@ function Orders() {
   const [selectedOrder, setSelectedOrder] = useState();
   const [currentTab, setCurrentTab] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [openEditDialogue, setOpenEditDialogue] = useState(false);
 
   const realtime = supabase
     .channel("orders")
@@ -92,7 +92,7 @@ function Orders() {
         table: "orders",
       },
       (payload) => {
-        console.log("payload:", payload);
+        console.log("payload:", payload.eventType);
         if (
           payload.eventType === "INSERT" ||
           payload.eventType === "UPDATE" ||
@@ -107,6 +107,35 @@ function Orders() {
   useEffect(() => {
     getAllOrders();
   }, []);
+
+  const setOrderCompleted = async () => {
+    const confirmed = confirm(
+      "Are you sure you want to mark this order as paid?"
+    );
+    if (!confirmed) return;
+    try {
+      const response = await fetch(`/api/markaspaid/${selectedOrder.orderId}`, {
+        method: "POST",
+      });
+      const data = await response.json();
+      if (!data.success) throw data.message;
+      toast({
+        title: "Success",
+        description: data.message,
+        variant: "success",
+        duration: 1500,
+      });
+      setSelectedOrder(null);
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Error",
+        description: error,
+        variant: "error",
+        duration: 1500,
+      });
+    }
+  };
 
   const getAllOrders = async () => {
     setLoading(true);
@@ -156,7 +185,6 @@ function Orders() {
   const handleOrderConfirmed = async () => {
     const confirmed = confirm("Are you sure you want to confirm this order?");
     if (!confirmed) return;
-    console.log("first");
     try {
       const response = await fetch(
         `/api/admin/orders/${selectedOrder.orderId}`,
@@ -175,6 +203,7 @@ function Orders() {
         variant: "success",
         duration: 1500,
       });
+      getAllOrders();
       setSelectedOrder(null);
     } catch (error) {
       console.error(error);
@@ -199,7 +228,12 @@ function Orders() {
                 setSelectedOrder(null);
               }}
               value="new">
-              New
+              <div className="flex items-center gap-1">
+                New
+                <Badge className="flex items-center justify-center w-4 h-4 ml-auto rounded-full shrink-0">
+                  {orders?.liveOrders?.length}
+                </Badge>
+              </div>
             </TabsTrigger>
             <TabsTrigger
               onClick={() => {
@@ -207,7 +241,12 @@ function Orders() {
                 setSelectedOrder(null);
               }}
               value="current">
-              Ongoing
+              <div className="flex items-center gap-1">
+                Ongoing
+                <Badge className="flex items-center justify-center w-4 h-4 ml-auto rounded-full shrink-0">
+                  {orders?.currentOrders?.length}
+                </Badge>
+              </div>
             </TabsTrigger>
             <TabsTrigger
               onClick={() => {
@@ -215,7 +254,12 @@ function Orders() {
                 setSelectedOrder(null);
               }}
               value="Payment">
-              Payment
+              <div className="flex items-center gap-1">
+                Payment
+                <Badge className="flex items-center justify-center w-4 h-4 ml-auto rounded-full shrink-0">
+                  {orders?.readyToPayOrders?.length}
+                </Badge>
+              </div>
             </TabsTrigger>
             <TabsTrigger
               onClick={() => {
@@ -223,7 +267,12 @@ function Orders() {
                 setSelectedOrder(null);
               }}
               value="Completed">
-              Completed
+              <div className="flex items-center gap-1">
+                Completed
+                <Badge className="flex items-center justify-center w-4 h-4 ml-auto rounded-full shrink-0">
+                  {orders?.completedOrders?.length}
+                </Badge>
+              </div>
             </TabsTrigger>
           </TabsList>
           <TabsContent
@@ -264,7 +313,24 @@ function Orders() {
               ))
             )}
           </TabsContent>
-          <TabsContent value="Payment">Change your password here.</TabsContent>
+          <TabsContent value="Payment">
+            {loading ? (
+              <>loading...</>
+            ) : (
+              orders?.readyToPayOrders?.map((order) => (
+                <div
+                  key={order.orderId}
+                  className={`w-full p-3 mb-2 rounded-lg ${order === selectedOrder ? "bg-zinc-700" : "bg-zinc-800 "}`}
+                  onClick={() => setSelectedOrder(order)}
+                  style={{ cursor: "pointer" }}>
+                  <p className="text-sm font-normal">
+                    <span className="font-bold">Table {order.tableNumber}</span>{" "}
+                    - {dayjs(order.created_at).format("h:mm A, 	MMMM D ")}
+                  </p>
+                </div>
+              ))
+            )}
+          </TabsContent>
           <TabsContent value="Completed">
             {loading ? (
               <>loading...</>
@@ -353,14 +419,23 @@ function Orders() {
                     </h1>
                   </div>
 
-                  <div className="flex justify-between m-4">
-                    <Button variant="destructive" onClick={handleCancelOrder}>
-                      Cancel Order
-                    </Button>
-                    <Button onClick={handleOrderConfirmed}>
-                      Confirm Order
-                    </Button>
-                  </div>
+                  {currentTab === 1 && (
+                    <div className="flex justify-between m-4">
+                      <Button variant="destructive" onClick={handleCancelOrder}>
+                        Cancel Order
+                      </Button>
+                      <Button onClick={handleOrderConfirmed}>
+                        Confirm Order
+                      </Button>
+                    </div>
+                  )}
+                  {currentTab === 3 && (
+                    <div className="flex justify-end m-4">
+                      <Button variant="" onClick={setOrderCompleted}>
+                        Mark As Paid
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

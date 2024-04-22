@@ -55,9 +55,6 @@ function Dashboard({ children }) {
                 className={`flex items-center gap-3 px-3 py-2 transition-all rounded-lg ${pathname === "orders" ? "bg-muted text-primary" : "text-muted-foreground"} hover:text-primary`}>
                 <ShoppingCart className="w-4 h-4" />
                 Orders
-                <Badge className="flex items-center justify-center w-6 h-6 ml-auto rounded-full shrink-0">
-                  6
-                </Badge>
               </Link>
               <Link
                 href="/admin/dishes"
@@ -105,9 +102,6 @@ function Dashboard({ children }) {
                 className="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground">
                 <ShoppingCart className="w-5 h-5" />
                 Orders
-                <Badge className="flex items-center justify-center w-6 h-6 ml-auto rounded-full shrink-0">
-                  6
-                </Badge>
               </Link>
               <Link
                 href="#"

@@ -325,34 +325,44 @@ function MenuItem({ dish }) {
                   <Button
                     onClick={() => {
                       let flag = false;
-                      Object.keys(chosenCustomization).forEach((cus) => {
-                        if (
-                          dish.availableCustomizations[[cus]].allowed === 1 &&
-                          chosenCustomization[[cus]].length !== 1
-                        ) {
-                          toast({
-                            variant: "destructive",
-                            title: "Please Fill All Required Fields",
-                            description: "Required Fields are marked with an *",
-                          });
-                          flag = true;
-                          return;
-                        }
-                      });
-                      if (flag) return;
-                      let copyOfDish = dish;
-                      copyOfDish.id = chance.guid();
-                      copyOfDish.price = dishPrice;
-                      copyOfDish.chosenCustomization = chosenCustomization;
-                      copyOfDish.status = "Pending";
-                      addItem(dish);
-                      setShowCustomizationDrawer(false);
-                      toast({
-                        title: "Success",
-                        description: "Item was successfully added to cart.",
-                        duration: 1500,
-                        variant: "success",
-                      });
+
+                      console.log("chosenCustomization:", chosenCustomization);
+                      try {
+                        Object.keys(chosenCustomization).forEach((cus) => {
+                          if (
+                            dish.availableCustomizations[[cus]].allowed === 1 &&
+                            chosenCustomization[[cus]].length !== 1
+                          ) {
+                            toast({
+                              variant: "destructive",
+                              title: "Please Fill All Required Fields",
+                              description:
+                                "Required Fields are marked with an *",
+                            });
+                            flag = true;
+                            return;
+                          }
+                        });
+                        if (flag) return;
+                        let copyOfDish = {
+                          ...dish,
+                          id: chance.guid(),
+                          price: dishPrice,
+                          chosenCustomization,
+                          status: "Pending",
+                        };
+                        addItem(copyOfDish);
+                        setShowCustomizationDrawer(false);
+                        setDishPrice(dish.price);
+                        toast({
+                          title: "Success",
+                          description: "Item was successfully added to cart.",
+                          duration: 1500,
+                          variant: "success",
+                        });
+                      } catch (e) {
+                        console.log(e);
+                      }
                     }}
                     className="w-[50%] font-bold">
                     Add |{" ₹"}
@@ -384,6 +394,18 @@ function MenuItem({ dish }) {
                 <Badge
                   onClick={() => {
                     setShowCustomizationDrawer(true);
+                    setDishPrice(dish.price);
+                    setChosenCustomization(() => {
+                      let temp = {};
+                      if (dish.availableCustomizations) {
+                        Object.keys(dish.availableCustomizations).forEach(
+                          (customization) => {
+                            temp[[customization]] = [];
+                          }
+                        );
+                      }
+                      return temp;
+                    });
                   }}
                   style={{ borderRadius: "0 5px  5px 0" }}>
                   +

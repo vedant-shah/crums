@@ -20,7 +20,9 @@ export async function GET(req, res) {
     data: {
       liveOrders: orders.filter((order) => order.status === "Pending"),
       completedOrders: orders.filter((order) => order.status === "Completed"),
-      reqPaymentOrders: orders.filter((order) => order.status === "ReqPayment"),
+      readyToPayOrders: orders.filter(
+        (order) => order.status === "Ready to pay"
+      ),
       currentOrders: orders.filter((order) => order.status === "In-progress"),
     },
     message: "Orders fetched successfully",
