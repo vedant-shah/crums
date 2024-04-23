@@ -126,6 +126,7 @@ function Orders() {
         duration: 1500,
       });
       setSelectedOrder(null);
+      getAllOrders();
     } catch (error) {
       console.error(error);
       toast({

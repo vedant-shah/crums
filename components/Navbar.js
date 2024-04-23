@@ -254,6 +254,7 @@ function Navbar() {
           duration: 2500,
           variant: "success",
         });
+        getRunningBill();
         emptyCart();
         setSpecialInstructions("");
       } catch (error) {
