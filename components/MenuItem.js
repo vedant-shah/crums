@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 import React, { useState, useEffect } from "react";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
@@ -68,105 +69,154 @@ function MenuItem({ dish }) {
   return (
     <>
       <Card className="flex p-2 my-3 max-w-[768px] lg-min-w-[768px]">
-        <div className="w-[70%] ps-1 py-2 pe-3">
-          <CardTitle className="mb-2">
-            <div className="flex items-center justify-between w-full">
-              {dish.isVeg ? (
-                <img
-                  src="https://img.icons8.com/color/480/vegetarian-food-symbol.png"
-                  style={{ width: "15px", height: "15px" }}
-                  className="mb-2 me-3"
-                  alt=""
-                />
-              ) : (
-                <Image
-                  src="/non-veg.png"
-                  style={{ width: "15px", height: "15px" }}
-                  className="mb-2 me-3"
-                  width={15}
-                  height={15}
-                  alt=""
-                />
-              )}
+        <div className="flex w-full justify-between ps-1 py-2 pe-3 ">
+          <div className="max-w-[70%] px-2">
+            <CardTitle className="mb-2">
+              <div className="flex items-center justify-between w-full">
+                {dish.isVeg ? (
+                  <img
+                    src="https://img.icons8.com/color/480/vegetarian-food-symbol.png"
+                    style={{ width: "15px", height: "15px" }}
+                    className="mb-2 me-3"
+                    alt=""
+                  />
+                ) : (
+                  <Image
+                    src="/non-veg.png"
+                    style={{ width: "15px", height: "15px" }}
+                    className="mb-2 me-3"
+                    width={15}
+                    height={15}
+                    alt=""
+                  />
+                )}
+              </div>
+              {dish.name}
+            </CardTitle>
+            <CardDescription className="font-medium flex items-center gap-1 leading-none tracking-tight">
+              ₹ {dish.price} ✦
               <div className="flex items-center">
                 <HiFire className="text-orange-600" />
-                <h3 className="font-light leading-none tracking-tight ">
+                <CardDescription className="font-medium leading-none tracking-tight ">
                   {dish.calories} KCal
-                </h3>
+                </CardDescription>
               </div>
-            </div>
-            {dish.name}
-          </CardTitle>
-          <CardDescription className="font-medium leading-none tracking-tight">
-            ₹ {dish.price}
-          </CardDescription>
-          <CardDescription className="mt-3 text-start">
-            {dish.description}
-          </CardDescription>
+            </CardDescription>
+            <CardDescription className="mt-3 text-start">
+              {dish.description}
+            </CardDescription>
+          </div>
+          <div className="flex flex-col justify-center relative">
+            <Image
+              src={dish.imgUrl}
+              width={100}
+              height={100}
+              className={`object-cover rounded h-[100px] w-[100px] `}
+              alt="image"
+            />
+            {dish.available &&
+              !dish.availableCustomizations &&
+              items.filter((item) => item._id === dish._id).length === 0 && (
+                <Button
+                  onClick={addItemToCart}
+                  size="sm"
+                  className="absolute w-[80%] left-0 right-0 m-auto bottom-[-10px]"
+                >
+                  Add
+                </Button>
+              )}
+            {!dish.availableCustomizations &&
+              items.filter((item) => item._id === dish._id).length > 0 && (
+                <div className="absolute flex justify-center left-0 right-0 m-auto bottom-[-10px]">
+                  <Badge
+                    onClick={() => {
+                      updateItemQuantity(
+                        items.filter((item) => item._id === dish._id)[0].id,
+                        items.filter((item) => item._id === dish._id)[0]
+                          .quantity - 1
+                      );
+                    }}
+                    style={{ borderRadius: "5px 0 0 5px" }}
+                  >
+                    -
+                  </Badge>
+                  <Badge
+                    variant="secondary"
+                    style={{ borderRadius: "0", backgroundColor: "black" }}
+                  >
+                    {items.filter((item) => item._id === dish._id)[0]?.quantity}
+                  </Badge>
+                  <Badge
+                    onClick={() => {
+                      updateItemQuantity(
+                        items.filter((item) => item._id === dish._id)[0].id,
+                        items.filter((item) => item._id === dish._id)[0]
+                          .quantity + 1
+                      );
+                    }}
+                    style={{ borderRadius: "0 5px  5px 0" }}
+                  >
+                    +
+                  </Badge>
+                </div>
+              )}
+            {dish.available &&
+              dish.availableCustomizations &&
+              items.filter((item) => item._id === dish._id).length === 0 && (
+                <Button
+                  size="sm"
+                  className="absolute w-[80%] left-0 right-0 m-auto bottom-[-10px]"
+                  onClick={() => setShowCustomizationDrawer(true)}
+                >
+                  Add
+                </Button>
+              )}
+            {dish.availableCustomizations &&
+              items.filter((item) => item._id === dish._id).length > 0 && (
+                <div className="absolute flex justify-center left-0 right-0 m-auto bottom-[-10px]">
+                  <Badge
+                    onClick={() => {
+                      updateItemQuantity(
+                        items.filter((item) => item._id === dish._id)[0].id,
+                        items.filter((item) => item._id === dish._id)[0]
+                          .quantity - 1
+                      );
+                    }}
+                    style={{ borderRadius: "5px 0 0 5px" }}
+                  >
+                    -
+                  </Badge>
+                  <Badge
+                    variant="secondary hover:disabled"
+                    style={{ borderRadius: "0", backgroundColor: "black" }}
+                  >
+                    {items.filter((item) => item._id === dish._id).length}
+                  </Badge>
+                  <Badge
+                    onClick={() => {
+                      setShowCustomizationDrawer(true);
+                      setDishPrice(dish.price);
+                      setChosenCustomization(() => {
+                        let temp = {};
+                        if (dish.availableCustomizations) {
+                          Object.keys(dish.availableCustomizations).forEach(
+                            (customization) => {
+                              temp[[customization]] = [];
+                            }
+                          );
+                        }
+                        return temp;
+                      });
+                    }}
+                    style={{ borderRadius: "0 5px  5px 0" }}
+                  >
+                    +
+                  </Badge>
+                </div>
+              )}
+          </div>
         </div>
-        <div className="w-[30%] flex justify-end items-center relative">
-          <Image
-            src={dish.imgUrl}
-            width={100}
-            height={100}
-            className={`object-cover rounded h-[100px] w-[100px] ${!dish.available && "filter grayscale"}`}
-            alt="image"
-          />
-          {!dish.available && (
-            <Badge className="absolute right-[5%] bottom-[5px]">
-              Unavailable
-            </Badge>
-          )}
-          {dish.available &&
-            !dish.availableCustomizations &&
-            items.filter((item) => item._id === dish._id).length === 0 && (
-              <Button
-                onClick={addItemToCart}
-                className="absolute right-[15%] bottom-[5px]">
-                Add
-              </Button>
-            )}
-          {!dish.availableCustomizations &&
-            items.filter((item) => item._id === dish._id).length > 0 && (
-              <div className="absolute right-[5%] bottom-[5px]">
-                <Badge
-                  onClick={() => {
-                    updateItemQuantity(
-                      items.filter((item) => item._id === dish._id)[0].id,
-                      items.filter((item) => item._id === dish._id)[0]
-                        .quantity - 1
-                    );
-                  }}
-                  style={{ borderRadius: "5px 0 0 5px" }}>
-                  -
-                </Badge>
-                <Badge
-                  variant="secondary"
-                  style={{ borderRadius: "0", backgroundColor: "black" }}>
-                  {items.filter((item) => item._id === dish._id)[0]?.quantity}
-                </Badge>
-                <Badge
-                  onClick={() => {
-                    updateItemQuantity(
-                      items.filter((item) => item._id === dish._id)[0].id,
-                      items.filter((item) => item._id === dish._id)[0]
-                        .quantity + 1
-                    );
-                  }}
-                  style={{ borderRadius: "0 5px  5px 0" }}>
-                  +
-                </Badge>
-              </div>
-            )}
-          {dish.available &&
-            dish.availableCustomizations &&
-            items.filter((item) => item._id === dish._id).length === 0 && (
-              <Button
-                className="absolute right-[15%] bottom-[5px]"
-                onClick={() => setShowCustomizationDrawer(true)}>
-                Add
-              </Button>
-            )}
+        <div className=" flex justify-end items-center relative">
           {dish.availableCustomizations && (
             <Drawer dismissible={false} open={showCustomizationDrawer}>
               <DrawerContent>
@@ -319,7 +369,8 @@ function MenuItem({ dish }) {
                   <Button
                     variant="outline"
                     className="w-[50%]"
-                    onClick={() => setShowCustomizationDrawer(false)}>
+                    onClick={() => setShowCustomizationDrawer(false)}
+                  >
                     Cancel
                   </Button>
                   <Button
@@ -364,7 +415,8 @@ function MenuItem({ dish }) {
                         console.log(e);
                       }
                     }}
-                    className="w-[50%] font-bold">
+                    className="w-[50%] font-bold"
+                  >
                     Add |{" ₹"}
                     {dishPrice}
                   </Button>
@@ -372,46 +424,6 @@ function MenuItem({ dish }) {
               </DrawerContent>
             </Drawer>
           )}
-          {dish.availableCustomizations &&
-            items.filter((item) => item._id === dish._id).length > 0 && (
-              <div className="absolute right-[5%] bottom-[5px]">
-                <Badge
-                  onClick={() => {
-                    updateItemQuantity(
-                      items.filter((item) => item._id === dish._id)[0].id,
-                      items.filter((item) => item._id === dish._id)[0]
-                        .quantity - 1
-                    );
-                  }}
-                  style={{ borderRadius: "5px 0 0 5px" }}>
-                  -
-                </Badge>
-                <Badge
-                  variant="secondary hover:disabled"
-                  style={{ borderRadius: "0", backgroundColor: "black" }}>
-                  {items.filter((item) => item._id === dish._id).length}
-                </Badge>
-                <Badge
-                  onClick={() => {
-                    setShowCustomizationDrawer(true);
-                    setDishPrice(dish.price);
-                    setChosenCustomization(() => {
-                      let temp = {};
-                      if (dish.availableCustomizations) {
-                        Object.keys(dish.availableCustomizations).forEach(
-                          (customization) => {
-                            temp[[customization]] = [];
-                          }
-                        );
-                      }
-                      return temp;
-                    });
-                  }}
-                  style={{ borderRadius: "0 5px  5px 0" }}>
-                  +
-                </Badge>
-              </div>
-            )}
         </div>
       </Card>
     </>

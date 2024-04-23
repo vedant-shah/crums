@@ -33,6 +33,7 @@ import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
 import Loader from "./ui/Loader";
+import supabase from "@/supabaseClient";
 
 function Navbar() {
   const { toast } = useToast();
@@ -69,6 +70,32 @@ function Navbar() {
     temp.sort((a, b) => courseOrder[a.course] - courseOrder[b.course]);
     setItems(temp);
   }, []);
+
+  const realtime = supabase
+    .channel("orders")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "orders",
+        filter:
+          typeof window !== "undefined" && localStorage?.getItem("tableNo")
+            ? `tableNumber=eq.${localStorage.getItem("tableNo")}`
+            : undefined,
+      },
+      (payload) => {
+        console.log("payload:", payload);
+        if (
+          payload.eventType === "INSERT" ||
+          payload.eventType === "UPDATE" ||
+          payload.eventType === "DELETE"
+        ) {
+          getRunningBill();
+        }
+      }
+    )
+    .subscribe();
 
   const requestBill = async () => {
     const confirm = window.confirm("Are you sure you want to request bill?");
@@ -111,15 +138,14 @@ function Navbar() {
 
   const getRunningBill = async () => {
     try {
-      const response = await fetch(
-        `/api/runningorders/${localStorage.getItem("tableNo")}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const tableNo = localStorage.getItem("tableNo");
+      if (!tableNo) return;
+      const response = await fetch(`/api/runningorders/${tableNo}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       const data = await response.json();
       if (!data.success) {
         throw data.message;
@@ -283,10 +309,12 @@ function Navbar() {
         <SheetContent
           side="left"
           onOpenAutoFocus={(e) => e.preventDefault()}
-          className="flex flex-col">
+          className="flex flex-col"
+        >
           <SheetHeader
             className="h-[15vh] flex flex-col justify-around"
-            style={{ flex: "0 0 auto" }}>
+            style={{ flex: "0 0 auto" }}
+          >
             <SheetTitle className="mb-3 text-3xl">
               Your Current Orders
             </SheetTitle>
@@ -295,7 +323,8 @@ function Navbar() {
           </SheetHeader>
           <ScrollArea
             className="flex items-center justify-center"
-            style={{ flex: "1 1 auto" }}>
+            style={{ flex: "1 1 auto" }}
+          >
             {runningOrders?.allItems?.length === 0 && (
               <>
                 <div className="flex flex-col items-center justify-center h-full">
@@ -351,7 +380,8 @@ function Navbar() {
           </ScrollArea>
           <div
             className="flex flex-col justify-end "
-            style={{ flex: "0 0 auto" }}>
+            style={{ flex: "0 0 auto" }}
+          >
             <div className="flex flex-col">
               <h1 className="mb-2 font-bold">Bill Details</h1>
               <div className="flex justify-between ">
@@ -374,7 +404,8 @@ function Navbar() {
             <Button
               disabled={loading || runningOrders?.allItems.length === 0}
               onClick={requestBill}
-              className="flex items-center">
+              className="flex items-center"
+            >
               {loading && <Loader className="w-5 h-5 " />}
               Request Bill
             </Button>
@@ -392,10 +423,12 @@ function Navbar() {
         </SheetTrigger>
         <SheetContent
           onOpenAutoFocus={(e) => e.preventDefault()}
-          className="flex flex-col">
+          className="flex flex-col"
+        >
           <SheetHeader
             className="h-[15vh] flex flex-col justify-around"
-            style={{ flex: "0 0 auto" }}>
+            style={{ flex: "0 0 auto" }}
+          >
             <SheetTitle className="mb-3 text-3xl">Your Order</SheetTitle>
             {typeof localStorage !== "undefined" &&
             localStorage.getItem("userData") ? (
@@ -416,7 +449,8 @@ function Navbar() {
                       localStorage.removeItem("userData");
                       setOtpPage("send");
                       setOpenLoginDialogue(true);
-                    }}>
+                    }}
+                  >
                     Click here
                   </span>{" "}
                   to change phone number
@@ -429,7 +463,8 @@ function Navbar() {
                   onClick={() => {
                     setOpenLoginDialogue(true);
                     setOtpPage("send");
-                  }}>
+                  }}
+                >
                   Login
                 </span>{" "}
               </>
@@ -438,7 +473,8 @@ function Navbar() {
           </SheetHeader>
           <ScrollArea
             className="flex items-center justify-center"
-            style={{ flex: "1 1 auto" }}>
+            style={{ flex: "1 1 auto" }}
+          >
             {items.length === 0 && (
               <>
                 <div className="flex flex-col items-center justify-center h-full">
@@ -488,7 +524,8 @@ function Navbar() {
                         onClick={() => {
                           updateItemQuantity(dish.id, dish.quantity - 1);
                         }}
-                        style={{ borderRadius: "5px 0 0 5px" }}>
+                        style={{ borderRadius: "5px 0 0 5px" }}
+                      >
                         -
                       </Badge>
                       <Badge variant="secondary" style={{ borderRadius: "0" }}>
@@ -498,7 +535,8 @@ function Navbar() {
                         onClick={() => {
                           updateItemQuantity(dish.id, dish.quantity + 1);
                         }}
-                        style={{ borderRadius: "0 5px  5px 0" }}>
+                        style={{ borderRadius: "0 5px  5px 0" }}
+                      >
                         +
                       </Badge>
                     </div>
@@ -512,7 +550,8 @@ function Navbar() {
           </ScrollArea>
           <div
             className="flex flex-col justify-end "
-            style={{ flex: "0 0 auto" }}>
+            style={{ flex: "0 0 auto" }}
+          >
             <input type="text" autoFocus="true" className="hidden" />
             <Textarea
               className="my-3"
@@ -540,7 +579,8 @@ function Navbar() {
             <Button
               disabled={items.length === 0}
               onClick={placeOrder}
-              className="flex items-center">
+              className="flex items-center"
+            >
               {loading && <Loader className="w-5 h-5 " />}
               Order
             </Button>
@@ -557,7 +597,8 @@ function Navbar() {
                 <div className="flex items-center ">
                   <Button
                     className="w-10 h-10 font-bold"
-                    style={{ borderRadius: "5px 0 0 5px" }}>
+                    style={{ borderRadius: "5px 0 0 5px" }}
+                  >
                     +91
                   </Button>
                   <Input
@@ -574,7 +615,8 @@ function Navbar() {
                 <Button
                   disabled={phone.length !== 10}
                   onClick={sendOTP}
-                  className="flex items-center">
+                  className="flex items-center"
+                >
                   {loading && <Loader className="w-5 h-5 " />}
                   Send Otp
                 </Button>
@@ -586,7 +628,8 @@ function Navbar() {
                   Not {phone} ? <br />
                   <span
                     className="text-blue-500 underline"
-                    onClick={() => setOtpPage("send")}>
+                    onClick={() => setOtpPage("send")}
+                  >
                     Click here
                   </span>{" "}
                   to change Phone number
@@ -600,7 +643,8 @@ function Navbar() {
                   }}
                   onComplete={() => {
                     verifyOTP();
-                  }}>
+                  }}
+                >
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />
                     <InputOTPSlot index={1} />
