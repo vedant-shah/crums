@@ -33,9 +33,15 @@ function TableOrder({ params }) {
   const [loading, setLoading] = useState(true);
   const [categoryOptions, setCategoryOptions] = useState([]);
   const { removeItem, items } = useCart();
+  const [structuredMenu, setStructuredMenu] = useState({
+    starter: [],
+    main: [],
+    dessert: [],
+  });
 
   //use-effects
   useEffect(() => {
+    console.log(cryptr.encrypt(7));
     decryptedTableNo = cryptr.decrypt(params.table);
     setTableNo(decryptedTableNo);
     localStorage.setItem("tableNo", decryptedTableNo);
@@ -69,6 +75,11 @@ function TableOrder({ params }) {
     });
     categories = new Set(categories);
     categories = [...categories];
+    let temp = { ...structuredMenu };
+    Object.keys(temp).forEach((key) => {
+      temp[key] = data.data.filter((val) => val.course === key);
+    });
+    setStructuredMenu(temp);
     setCategoryOptions(categories);
     setLoading(false);
   };
@@ -140,7 +151,8 @@ function TableOrder({ params }) {
                   onClick={() => {
                     setSearchValue("");
                     setSelectedCategory("All");
-                  }}>
+                  }}
+                >
                   All
                 </DropdownMenuRadioItem>
                 {categoryOptions.map((category) => {
@@ -151,7 +163,8 @@ function TableOrder({ params }) {
                       onClick={() => {
                         setSearchValue(category);
                         setSelectedCategory(category);
-                      }}>
+                      }}
+                    >
                       {category}
                     </DropdownMenuRadioItem>
                   );
@@ -160,7 +173,25 @@ function TableOrder({ params }) {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        {dishItems.length > 0 ? dishItems : !loading && displayMessage}
+        {!loading && searchValue.length === 0 && (
+          <>
+            {Object.keys(structuredMenu).map((key) => {
+              return (
+                <div key={key}>
+                  <h1 className="text-2xl font-bold">
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                  </h1>
+                  <hr className="my-2 mb-4" />
+                  {structuredMenu[key].map((dish) => {
+                    return <MenuItem dish={dish} key={dish.id} />;
+                  })}
+                </div>
+              );
+            })}
+          </>
+        )}
+        {searchValue.length > 0 && dishItems.length > 0 && dishItems}
+        {!loading && searchValue.length > 0 && displayMessage}
         {loading && (
           <>
             <SkeletonMenuItem />
