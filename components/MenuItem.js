@@ -40,6 +40,18 @@ function MenuItem({ dish }) {
     return temp;
   });
 
+  useEffect(() => {
+    setChosenCustomization(() => {
+      let temp = {};
+      if (dish.availableCustomizations) {
+        Object.keys(dish.availableCustomizations).forEach((customization) => {
+          temp[[customization]] = [];
+        });
+      }
+      return temp;
+    });
+  }, [showCustomizationDrawer]);
+
   const addItemToCart = () => {
     dish.id = chance.guid();
     dish.status = "Pending";
@@ -69,7 +81,7 @@ function MenuItem({ dish }) {
   return (
     <>
       <Card className="flex p-2 my-3 max-w-[768px] lg-min-w-[768px]">
-        <div className="flex w-full justify-between ps-1 py-2 pe-3 ">
+        <div className="flex justify-between w-full py-2 ps-1 pe-3 ">
           <div className="max-w-[70%] px-2">
             <CardTitle className="mb-2">
               <div className="flex items-center justify-between w-full">
@@ -93,7 +105,7 @@ function MenuItem({ dish }) {
               </div>
               {dish.name}
             </CardTitle>
-            <CardDescription className="font-medium flex items-center gap-1 leading-none tracking-tight">
+            <CardDescription className="flex items-center gap-1 font-medium leading-none tracking-tight">
               ₹ {dish.price} ✦
               <div className="flex items-center">
                 <HiFire className="text-orange-600" />
@@ -106,7 +118,7 @@ function MenuItem({ dish }) {
               {dish.description}
             </CardDescription>
           </div>
-          <div className="flex flex-col justify-center relative">
+          <div className="relative flex flex-col justify-center">
             <Image
               src={dish.imgUrl}
               width={100}
@@ -120,8 +132,7 @@ function MenuItem({ dish }) {
                 <Button
                   onClick={addItemToCart}
                   size="sm"
-                  className="absolute w-[80%] left-0 right-0 m-auto bottom-[-10px]"
-                >
+                  className="absolute w-[80%] left-0 right-0 m-auto bottom-[-10px]">
                   Add
                 </Button>
               )}
@@ -136,14 +147,12 @@ function MenuItem({ dish }) {
                           .quantity - 1
                       );
                     }}
-                    style={{ borderRadius: "5px 0 0 5px" }}
-                  >
+                    style={{ borderRadius: "5px 0 0 5px" }}>
                     -
                   </Badge>
                   <Badge
                     variant="secondary"
-                    style={{ borderRadius: "0", backgroundColor: "black" }}
-                  >
+                    style={{ borderRadius: "0", backgroundColor: "black" }}>
                     {items.filter((item) => item._id === dish._id)[0]?.quantity}
                   </Badge>
                   <Badge
@@ -154,8 +163,7 @@ function MenuItem({ dish }) {
                           .quantity + 1
                       );
                     }}
-                    style={{ borderRadius: "0 5px  5px 0" }}
-                  >
+                    style={{ borderRadius: "0 5px  5px 0" }}>
                     +
                   </Badge>
                 </div>
@@ -166,8 +174,7 @@ function MenuItem({ dish }) {
                 <Button
                   size="sm"
                   className="absolute w-[80%] left-0 right-0 m-auto bottom-[-10px]"
-                  onClick={() => setShowCustomizationDrawer(true)}
-                >
+                  onClick={() => setShowCustomizationDrawer(true)}>
                   Add
                 </Button>
               )}
@@ -182,14 +189,12 @@ function MenuItem({ dish }) {
                           .quantity - 1
                       );
                     }}
-                    style={{ borderRadius: "5px 0 0 5px" }}
-                  >
+                    style={{ borderRadius: "5px 0 0 5px" }}>
                     -
                   </Badge>
                   <Badge
                     variant="secondary hover:disabled"
-                    style={{ borderRadius: "0", backgroundColor: "black" }}
-                  >
+                    style={{ borderRadius: "0", backgroundColor: "black" }}>
                     {items.filter((item) => item._id === dish._id).length}
                   </Badge>
                   <Badge
@@ -208,15 +213,14 @@ function MenuItem({ dish }) {
                         return temp;
                       });
                     }}
-                    style={{ borderRadius: "0 5px  5px 0" }}
-                  >
+                    style={{ borderRadius: "0 5px  5px 0" }}>
                     +
                   </Badge>
                 </div>
               )}
           </div>
         </div>
-        <div className=" flex justify-end items-center relative">
+        <div className="relative flex items-center justify-end ">
           {dish.availableCustomizations && (
             <Drawer dismissible={false} open={showCustomizationDrawer}>
               <DrawerContent>
@@ -369,8 +373,7 @@ function MenuItem({ dish }) {
                   <Button
                     variant="outline"
                     className="w-[50%]"
-                    onClick={() => setShowCustomizationDrawer(false)}
-                  >
+                    onClick={() => setShowCustomizationDrawer(false)}>
                     Cancel
                   </Button>
                   <Button
@@ -415,8 +418,7 @@ function MenuItem({ dish }) {
                         console.log(e);
                       }
                     }}
-                    className="w-[50%] font-bold"
-                  >
+                    className="w-[50%] font-bold">
                     Add |{" ₹"}
                     {dishPrice}
                   </Button>

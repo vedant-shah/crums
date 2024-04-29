@@ -173,7 +173,7 @@ function Dashboard() {
         </Card>
       </div>
       <div className="flex w-full h-full">
-        <ResponsiveContainer width="50%" height="95%">
+        <ResponsiveContainer width="50%" height="100%">
           <LineChart width={300} height={300} data={analyticsData?.monthlyData}>
             {/* <CartesianGrid strokeDasharray="3 3" /> */}
             <XAxis dataKey="month" />
@@ -188,7 +188,7 @@ function Dashboard() {
             />
           </LineChart>
         </ResponsiveContainer>
-        <ResponsiveContainer width="50%" height="95%">
+        <ResponsiveContainer width="50%" height="100%">
           <BarChart width={500} height={300} data={analyticsData?.monthlyData}>
             <XAxis dataKey="month" />
             <Legend />

@@ -1,16 +1,36 @@
 import { NextResponse } from "next/server";
 import supabase from "../../../supabaseClient";
+import fs from "fs";
 
 export async function PUT(req, { params }) {
   const { orderid } = params;
 
   try {
+    const filePath = "./app/api/windowOrders.json";
+    if (!fs.existsSync(filePath)) {
+      fs.writeFileSync(filePath, "[]");
+    }
+    const fileContents = fs.readFileSync(filePath, "utf8");
+    const windowOrders = JSON.parse(fileContents || "[]");
+
     const { data, error } = await supabase
       .from("orders")
       .update({ status: "In-progress" })
-      .eq("orderId", orderid);
-
+      .eq("orderId", orderid)
+      .select("*");
+    console.log("data:", data);
     if (error) throw error;
+
+    data[0].items.forEach((item) => {
+      windowOrders.push({
+        ...item,
+        orderid,
+        tableNumber: data[0].tableNumber,
+        specialInstructions: data[0].specialInstructions,
+      });
+    });
+
+    fs.writeFileSync(filePath, JSON.stringify(windowOrders, null, 2));
 
     return NextResponse.json({
       data: [],

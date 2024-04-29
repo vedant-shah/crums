@@ -121,7 +121,7 @@ function TableOrder({ params }) {
     <>
       <div className="flex flex-col p-4 max-w-[768px]  mx-auto">
         <h1 className="text-4xl font-extrabold tracking-tight mb-7 scroll-m-20 lg:text-5xl">
-          Hey there!
+          Welcome to CRUMS!
         </h1>
         <Input
           value={searchValue}
@@ -151,8 +151,7 @@ function TableOrder({ params }) {
                   onClick={() => {
                     setSearchValue("");
                     setSelectedCategory("All");
-                  }}
-                >
+                  }}>
                   All
                 </DropdownMenuRadioItem>
                 {categoryOptions.map((category) => {
@@ -163,8 +162,7 @@ function TableOrder({ params }) {
                       onClick={() => {
                         setSearchValue(category);
                         setSelectedCategory(category);
-                      }}
-                    >
+                      }}>
                       {category}
                     </DropdownMenuRadioItem>
                   );
@@ -178,11 +176,12 @@ function TableOrder({ params }) {
             {Object.keys(structuredMenu).map((key) => {
               return (
                 <div key={key}>
-                  <h1 className="text-2xl font-bold">
+                  <h1 className="my-4 text-2xl font-bold">
                     {key.charAt(0).toUpperCase() + key.slice(1)}
                   </h1>
                   <hr className="my-2 mb-4" />
                   {structuredMenu[key].map((dish) => {
+                    if (vegOnly && !dish.isVeg) return;
                     return <MenuItem dish={dish} key={dish.id} />;
                   })}
                 </div>
@@ -191,7 +190,10 @@ function TableOrder({ params }) {
           </>
         )}
         {searchValue.length > 0 && dishItems.length > 0 && dishItems}
-        {!loading && searchValue.length > 0 && displayMessage}
+        {!loading &&
+          searchValue.length > 0 &&
+          dishItems.length === 0 &&
+          displayMessage}
         {loading && (
           <>
             <SkeletonMenuItem />
