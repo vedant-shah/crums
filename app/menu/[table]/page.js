@@ -32,7 +32,7 @@ function TableOrder({ params }) {
   const [vegOnly, setVegOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [categoryOptions, setCategoryOptions] = useState([]);
-  const { removeItem, items } = useCart();
+  const { removeItem, items, inCart } = useCart();
   const [structuredMenu, setStructuredMenu] = useState({
     starter: [],
     main: [],
@@ -47,20 +47,6 @@ function TableOrder({ params }) {
     localStorage.setItem("tableNo", decryptedTableNo);
     setLoading(true);
     getAllDishes();
-
-    items.forEach((item) => {
-      if (
-        item.tableNo !== decryptedTableNo ||
-        allDishes.filter((dish) => dish.available === false).includes(item)
-      ) {
-        console.log(
-          "removing item",
-          item.name,
-          "from cart as it is not available"
-        );
-        removeItem(item.id);
-      }
-    });
   }, []);
 
   //functions
@@ -73,6 +59,12 @@ function TableOrder({ params }) {
     data.data.forEach((dish) => {
       categories.push(dish.cuisine);
     });
+    let unavailableItems = data.data.filter((dish) => dish.available === false);
+    console.log(unavailableItems);
+    unavailableItems.forEach((item) => {
+      removeItem(item._id);
+    });
+
     categories = new Set(categories);
     categories = [...categories];
     let temp = { ...structuredMenu };
@@ -151,7 +143,8 @@ function TableOrder({ params }) {
                   onClick={() => {
                     setSearchValue("");
                     setSelectedCategory("All");
-                  }}>
+                  }}
+                >
                   All
                 </DropdownMenuRadioItem>
                 {categoryOptions.map((category) => {
@@ -162,7 +155,8 @@ function TableOrder({ params }) {
                       onClick={() => {
                         setSearchValue(category);
                         setSelectedCategory(category);
-                      }}>
+                      }}
+                    >
                       {category}
                     </DropdownMenuRadioItem>
                   );
