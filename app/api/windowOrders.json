@@ -355,5 +355,154 @@
     "orderid": "347a7bbb-faf3-5c94-93ce-6b4b3fcac310",
     "tableNumber": 7,
     "specialInstructions": "hi this is a test special instruction"
+  },
+  {
+    "id": "d221cfb8-4061-545a-95e3-de6d0a56c854",
+    "_id": 4,
+    "name": "Spinach Omelette",
+    "isVeg": false,
+    "price": 180,
+    "course": "main",
+    "imgUrl": "https://www.archanaskitchen.com//images/archanaskitchen/World_Breakfast/Healthy_Egg_Whites_Omelette_Recipe-2.jpg",
+    "status": "Pending",
+    "cuisine": "Continental",
+    "isVegan": false,
+    "calories": 200,
+    "cookTime": 10,
+    "quantity": 1,
+    "servings": 1,
+    "allergies": null,
+    "available": true,
+    "itemTotal": 180,
+    "created_at": "2024-02-02T13:12:52.814727+00:00",
+    "description": "Savory spinach folded with eggs, a tender, flavorful morning embrace.",
+    "isSugarFree": true,
+    "isGlutenFree": true,
+    "isHighProtein": true,
+    "availableCustomizations": null,
+    "orderid": "15cbd30c-edb8-507e-a2f6-1a6ef32150ed",
+    "tableNumber": 5,
+    "specialInstructions": ""
+  },
+  {
+    "id": "293dc723-86fc-54df-968f-80e35d6e903b",
+    "_id": 10,
+    "name": "Chicken Shawarma",
+    "isVeg": false,
+    "price": 180,
+    "course": "main",
+    "imgUrl": "https://www.archanaskitchen.com/images/archanaskitchen/1-Author/sibyl-archanaskitchen.com/Chicken_Shwarma_Recipe_.jpg",
+    "status": "Pending",
+    "cuisine": "Middle Eastern",
+    "isVegan": false,
+    "calories": 800,
+    "cookTime": 12,
+    "quantity": 1,
+    "servings": 2,
+    "allergies": null,
+    "available": true,
+    "itemTotal": 180,
+    "created_at": "2024-02-02T13:43:19.292076+00:00",
+    "description": "Succulent grilled chicken wrapped in warm pita with savory spices.",
+    "isSugarFree": false,
+    "isGlutenFree": false,
+    "isHighProtein": true,
+    "availableCustomizations": null,
+    "orderid": "15cbd30c-edb8-507e-a2f6-1a6ef32150ed",
+    "tableNumber": 5,
+    "specialInstructions": ""
+  },
+  {
+    "id": "3de1f160-a001-5c65-bbb7-6a2007513c58",
+    "_id": 1,
+    "name": "Black Bean Burrito",
+    "isVeg": true,
+    "price": 309,
+    "course": "main",
+    "imgUrl": "https://www.archanaskitchen.com//images/archanaskitchen/1-Author/Madhuri_Aggarwal/Black_Bean_Burrito.jpg",
+    "status": "Pending",
+    "cuisine": "Mexican",
+    "isVegan": false,
+    "calories": 522,
+    "cookTime": 30,
+    "quantity": 1,
+    "servings": 4,
+    "allergies": "lactose",
+    "available": true,
+    "itemTotal": 309,
+    "created_at": "2024-02-02T11:27:14.584251+00:00",
+    "description": "Savory black beans, wrapped in warm tortilla, bursting with flavors.",
+    "isSugarFree": false,
+    "isGlutenFree": false,
+    "isHighProtein": true,
+    "chosenCustomization": {
+      "Choose Base": [
+        "Maida"
+      ],
+      "Choose Fillings": [
+        "Cheese"
+      ],
+      "Additional Toppings": [
+        "Lettuce"
+      ]
+    },
+    "availableCustomizations": {
+      "Choose Base": {
+        "values": {
+          "Maida": 0,
+          "Whole Wheat": 50
+        },
+        "allowed": 1
+      },
+      "Choose Fillings": {
+        "values": {
+          "Rice": 0,
+          "Cheese": 0,
+          "Fajita": 0,
+          "Pinto Beans": 0,
+          "Spicy Salsa": 0
+        },
+        "allowed": 4
+      },
+      "Additional Toppings": {
+        "values": {
+          "Lettuce": 30,
+          "Guacomole": 70,
+          "Extra Cheese": 50
+        },
+        "allowed": -1
+      }
+    },
+    "orderid": "15cbd30c-edb8-507e-a2f6-1a6ef32150ed",
+    "tableNumber": 5,
+    "specialInstructions": ""
+  },
+  {
+    "id": "5ec91d3b-9b6c-5225-8031-24c1ab8bb74a",
+    "_id": 8,
+    "name": "Chilli Paneer",
+    "isVeg": true,
+    "price": 325,
+    "course": "starter",
+    "imgUrl": "https://www.archanaskitchen.com/images/archanaskitchen/Indian_Appetizers/Chilli_Paneer_-_Hot_and_Spicy_Cottage_Cheese.jpg",
+    "status": "Pending",
+    "cuisine": "Chinese",
+    "isVegan": false,
+    "calories": 750,
+    "cookTime": 8,
+    "quantity": 1,
+    "servings": 2,
+    "allergies": null,
+    "available": true,
+    "itemTotal": 325,
+    "created_at": "2024-02-02T13:36:57.894046+00:00",
+    "description": "Succulent paneer cubes drenched in fiery chili-infused sauce, tantalizingly satisfying.",
+    "isSugarFree": false,
+    "isGlutenFree": false,
+    "isHighProtein": true,
+    "availableCustomizations": null,
+    "orderid": "2108194b-1f95-55f1-9380-c5aa46d8b618",
+    "tableNumber": 5,
+    "specialInstructions": ""
   }
 ]

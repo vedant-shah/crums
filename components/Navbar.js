@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 import React, { useState, useEffect } from "react";
 import { useCart } from "react-use-cart";
@@ -242,8 +243,8 @@ function Navbar() {
     }
   };
   const placeOrder = async () => {
-    confirm = window.confirm("Are you sure you want to place the order?");
-    if (!confirm) return;
+    let confirmed = confirm("Are you sure you want to place the order?");
+    if (!confirmed) return;
     if (!localStorage.getItem("userData")) {
       setOpenLoginDialogue(true);
       setOtpPage("send");
@@ -316,7 +317,7 @@ function Navbar() {
           className="flex flex-col"
         >
           <SheetHeader
-            className="h-[15vh] flex flex-col justify-around"
+            className="h-[10vh] flex flex-col justify-around"
             style={{ flex: "0 0 auto" }}
           >
             <SheetTitle className="mb-3 text-3xl">
@@ -329,13 +330,24 @@ function Navbar() {
             className="flex items-center justify-center"
             style={{ flex: "1 1 auto" }}
           >
-            {runningOrders?.allItems?.length === 0 && (
+            {runningOrders?.allItems?.length === 0 &&
+              runningOrders?.pendingPayment === "0.00" && (
+                <>
+                  <div className="flex flex-col items-center justify-center h-full">
+                    <TbFaceId className="w-16 h-16" />
+                    <h1 className="mt-2 text-lg">
+                      Oops! There's nothing here to see.
+                    </h1>
+                  </div>
+                </>
+              )}
+            {runningOrders?.pendingPayment > 0 && (
               <>
-                <div className="flex flex-col items-center justify-center h-full">
-                  <TbFaceId className="w-16 h-16" />
-                  <h1 className="mt-2 text-lg">
-                    Oops! There's nothing here to see.
-                  </h1>
+                <div className="flex  items-center justify-between w-full mb-3">
+                  <p className="text-base font-bold">Pending Payment:</p>
+                  <Badge variant="warning">
+                    ₹ {runningOrders?.pendingPayment}
+                  </Badge>
                 </div>
               </>
             )}
@@ -435,7 +447,9 @@ function Navbar() {
             style={{ flex: "0 0 auto" }}
           >
             <SheetTitle className="mb-3 text-3xl">
-              Table: {localStorage.getItem("tableNo")}
+              Table:{" "}
+              {typeof localStorage !== "undefined" &&
+                localStorage.getItem("tableNo")}
             </SheetTitle>
             {typeof localStorage !== "undefined" &&
             localStorage.getItem("userData") ? (

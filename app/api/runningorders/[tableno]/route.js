@@ -16,27 +16,43 @@ export async function GET(req, { params }) {
       status: 200,
     });
   }
-  const { data, error } = await supabase
+  const { data: inProgressData, error: inProgressErrors } = await supabase
     .from("orders")
     .select("*")
     .eq("tableNumber", params.tableno)
     .eq("status", "In-progress");
 
-  if (error) {
+  if (inProgressErrors) {
     return NextResponse.json({
       data: null,
-      error: error.message,
+      error: inProgressErrors.message,
       success: false,
       status: 500,
     });
   }
 
+  const { data: requestedBillData, error: requestedBillErrors } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("tableNumber", params.tableno)
+    .eq("status", "Ready to pay");
+
+  if (requestedBillErrors) {
+    return NextResponse.json({
+      data: null,
+      error: requestedBillErrors.message,
+      success: false,
+      status: 500,
+    });
+  }
+
+  let requestedBill = 0;
   let grandTotal = 0;
   let grandTotalGst = 0;
   const allItems = [];
   const allOrderIds = [];
 
-  data.forEach((order) => {
+  inProgressData.forEach((order) => {
     grandTotal += order.total;
     grandTotalGst += order.gst;
     order.items.forEach((item) => {
@@ -51,12 +67,21 @@ export async function GET(req, { params }) {
     });
     // allItems.push(order);
   });
+  console.log(
+    "🚀 ~ requestedBillData.forEach ~ requestedBillData:",
+    requestedBillData
+  );
+
+  requestedBillData.forEach((order) => {
+    requestedBill += order.total + order.gst;
+  });
 
   const result = {
     grandTotal,
     grandTotalGst,
     allItems: allItems,
     allOrderIds,
+    pendingPayment: requestedBill.toFixed(2),
   };
 
   return NextResponse.json({

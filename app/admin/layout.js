@@ -84,7 +84,7 @@ function Dashboard({ children }) {
           </div>
         </div>
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col h-[100vh] overflow-y-auto">
         <Sheet>
           <SheetTrigger asChild>
             <Button

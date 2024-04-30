@@ -61,8 +61,15 @@ function TableOrder({ params }) {
     });
     let unavailableItems = data.data.filter((dish) => dish.available === false);
     console.log(unavailableItems);
-    unavailableItems.forEach((item) => {
-      removeItem(item._id);
+    items.forEach((item) => {
+      console.log(
+        item,
+        unavailableItems.find((val) => val._id === item._id)
+      );
+      if (unavailableItems.find((val) => val._id === item._id)) {
+        console.log("removing", item.name);
+        removeItem(item.id);
+      }
     });
 
     categories = new Set(categories);
