@@ -16,15 +16,23 @@ export async function POST(req) {
       status: 200,
     });
   }
+  const { data: inProgressData, error: inProgressErrors } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("tableNumber", tableNumber)
+    .eq("status", "In-progress");
+
+  console.log(inProgressData);
   const { data, error } = await supabase
     .from("orders")
     .update({ status: "Ready to pay" })
     .eq("tableNumber", tableNumber)
-    .eq("status", "In-progress");
+    .eq("status", "In-progress")
+    .select("*");
 
   if (error) {
     return NextResponse.json({
-      data: null,
+      data: data,
       error: error.message,
       success: false,
       status: 500,

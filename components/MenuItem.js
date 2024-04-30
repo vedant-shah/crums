@@ -118,21 +118,30 @@ function MenuItem({ dish }) {
               {dish.description}
             </CardDescription>
           </div>
-          <div className="relative flex flex-col justify-center">
+          <div
+            className={`relative flex flex-col ${!dish.available ? "grayscale" : ""} justify-center`}
+          >
             <Image
               src={dish.imgUrl}
               width={100}
               height={100}
-              className={`object-cover rounded h-[100px] w-[100px] `}
+              //
+              className={`object-cover rounded h-[100px] w-[100px]   `}
               alt="image"
             />
+            {!dish.available && (
+              <Badge size="sm" variant="secondary" className="mx-auto">
+                Unavailable
+              </Badge>
+            )}
             {dish.available &&
               !dish.availableCustomizations &&
               items.filter((item) => item._id === dish._id).length === 0 && (
                 <Button
                   onClick={addItemToCart}
                   size="sm"
-                  className="absolute w-[80%] left-0 right-0 m-auto bottom-[-10px]">
+                  className="absolute w-[80%] left-0 right-0 m-auto bottom-[-10px]"
+                >
                   Add
                 </Button>
               )}
@@ -147,12 +156,14 @@ function MenuItem({ dish }) {
                           .quantity - 1
                       );
                     }}
-                    style={{ borderRadius: "5px 0 0 5px" }}>
+                    style={{ borderRadius: "5px 0 0 5px" }}
+                  >
                     -
                   </Badge>
                   <Badge
                     variant="secondary"
-                    style={{ borderRadius: "0", backgroundColor: "black" }}>
+                    style={{ borderRadius: "0", backgroundColor: "black" }}
+                  >
                     {items.filter((item) => item._id === dish._id)[0]?.quantity}
                   </Badge>
                   <Badge
@@ -163,7 +174,8 @@ function MenuItem({ dish }) {
                           .quantity + 1
                       );
                     }}
-                    style={{ borderRadius: "0 5px  5px 0" }}>
+                    style={{ borderRadius: "0 5px  5px 0" }}
+                  >
                     +
                   </Badge>
                 </div>
@@ -174,7 +186,8 @@ function MenuItem({ dish }) {
                 <Button
                   size="sm"
                   className="absolute w-[80%] left-0 right-0 m-auto bottom-[-10px]"
-                  onClick={() => setShowCustomizationDrawer(true)}>
+                  onClick={() => setShowCustomizationDrawer(true)}
+                >
                   Add
                 </Button>
               )}
@@ -189,12 +202,14 @@ function MenuItem({ dish }) {
                           .quantity - 1
                       );
                     }}
-                    style={{ borderRadius: "5px 0 0 5px" }}>
+                    style={{ borderRadius: "5px 0 0 5px" }}
+                  >
                     -
                   </Badge>
                   <Badge
                     variant="secondary hover:disabled"
-                    style={{ borderRadius: "0", backgroundColor: "black" }}>
+                    style={{ borderRadius: "0", backgroundColor: "black" }}
+                  >
                     {items.filter((item) => item._id === dish._id).length}
                   </Badge>
                   <Badge
@@ -213,7 +228,8 @@ function MenuItem({ dish }) {
                         return temp;
                       });
                     }}
-                    style={{ borderRadius: "0 5px  5px 0" }}>
+                    style={{ borderRadius: "0 5px  5px 0" }}
+                  >
                     +
                   </Badge>
                 </div>
@@ -373,7 +389,8 @@ function MenuItem({ dish }) {
                   <Button
                     variant="outline"
                     className="w-[50%]"
-                    onClick={() => setShowCustomizationDrawer(false)}>
+                    onClick={() => setShowCustomizationDrawer(false)}
+                  >
                     Cancel
                   </Button>
                   <Button
@@ -418,7 +435,8 @@ function MenuItem({ dish }) {
                         console.log(e);
                       }
                     }}
-                    className="w-[50%] font-bold">
+                    className="w-[50%] font-bold"
+                  >
                     Add |{" ₹"}
                     {dishPrice}
                   </Button>
