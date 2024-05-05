@@ -30,6 +30,7 @@ import Image from "next/image";
 import { useToast } from "@/components/ui/use-toast";
 import Loader from "./ui/Loader";
 import supabase from "@/supabaseClient";
+import Link from "next/link";
 
 function Navbar() {
   const { toast } = useToast();
@@ -320,12 +321,13 @@ function Navbar() {
             <div className="flex items-center justify-between w-full ">
               <h1>
                 Progress:{" "}
-                {(runningOrders?.allItems?.filter(
-                  (item) => item.status === "Prepared"
-                ).length *
-                  100) /
-                  runningOrders?.allItems?.length +
-                  "%"}{" "}
+                {(
+                  (runningOrders?.allItems?.filter(
+                    (item) => item.status === "Prepared"
+                  ).length *
+                    100) /
+                  runningOrders?.allItems?.length
+                ).toFixed(0) + "%"}{" "}
               </h1>
               <Progress
                 value={
@@ -495,6 +497,11 @@ function Navbar() {
                     Change
                   </span>{" "}
                 </span>
+                <Link
+                  className="text-blue-500 underline"
+                  href={"/order-history"}>
+                  Previous Orders
+                </Link>
               </>
             ) : (
               <>

@@ -47,36 +47,26 @@ function Dashboard({ children }) {
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
               <Link
                 href="/admin/dashboard"
-                className={`flex items-center gap-3 px-3 py-2 ${pathname === "dashboard" ? "bg-muted text-primary" : "text-muted-foreground"} transition-all rounded-lg  hover:text-primary`}
-              >
+                className={`flex items-center gap-3 px-3 py-2 ${pathname === "dashboard" ? "bg-muted text-primary" : "text-muted-foreground"} transition-all rounded-lg  hover:text-primary`}>
                 <Home className="w-4 h-4" />
                 Dashboard
               </Link>
               <Link
                 href="/admin/orders"
-                className={`flex items-center gap-3 px-3 py-2 transition-all rounded-lg ${pathname === "orders" ? "bg-muted text-primary" : "text-muted-foreground"} hover:text-primary`}
-              >
+                className={`flex items-center gap-3 px-3 py-2 transition-all rounded-lg ${pathname === "orders" ? "bg-muted text-primary" : "text-muted-foreground"} hover:text-primary`}>
                 <ShoppingCart className="w-4 h-4" />
                 Orders
               </Link>
               <Link
                 href="/admin/dishes"
-                className={`flex items-center gap-3 px-3 py-2 transition-all rounded-lg ${pathname === "dishes" ? "bg-muted text-primary" : "text-muted-foreground"} hover:text-primary`}
-              >
+                className={`flex items-center gap-3 px-3 py-2 transition-all rounded-lg ${pathname === "dishes" ? "bg-muted text-primary" : "text-muted-foreground"} hover:text-primary`}>
                 <Package className="w-4 h-4" />
                 Dishes{" "}
               </Link>
-              <Link
-                href="/admin/coupons"
-                className={`flex items-center gap-3 px-3 py-2 transition-all rounded-lg ${pathname === "coupons" ? "bg-muted text-primary" : "text-muted-foreground"} hover:text-primary`}
-              >
-                <Ticket className="w-4 h-4" />
-                Coupons{" "}
-              </Link>
+
               <Link
                 href="/admin/customers"
-                className={`flex items-center gap-3 px-3 py-2 transition-all rounded-lg ${pathname === "customers" ? "bg-muted text-primary" : "text-muted-foreground"} hover:text-primary`}
-              >
+                className={`flex items-center gap-3 px-3 py-2 transition-all rounded-lg ${pathname === "customers" ? "bg-muted text-primary" : "text-muted-foreground"} hover:text-primary`}>
                 <Users className="w-4 h-4" />
                 Customers
               </Link>
@@ -90,8 +80,7 @@ function Dashboard({ children }) {
             <Button
               variant="outline"
               size="icon"
-              className="shrink-0 md:hidden"
-            >
+              className="shrink-0 md:hidden">
               <Menu className="w-5 h-5" />
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
@@ -100,43 +89,32 @@ function Dashboard({ children }) {
             <nav className="grid gap-2 text-lg font-medium">
               <Link
                 href="#"
-                className="flex items-center gap-2 text-lg font-semibold"
-              >
+                className="flex items-center gap-2 text-lg font-semibold">
                 <Package2 className="w-6 h-6" />
                 <span className="sr-only">CRUMS</span>
               </Link>
               <Link
                 href="/dashboard"
-                className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-              >
+                className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground">
                 <Home className="w-5 h-5" />
                 Dashboard
               </Link>
               <Link
                 href="#"
-                className="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground"
-              >
+                className="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground">
                 <ShoppingCart className="w-5 h-5" />
                 Orders
               </Link>
               <Link
                 href="#"
-                className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-              >
+                className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground">
                 <Package className="w-5 h-5" />
                 Products
               </Link>
-              <Link
-                href="/admin/coupons"
-                className={`flex items-center gap-3 px-3 py-2 transition-all rounded-lg ${pathname === "coupons" ? "bg-muted text-primary" : "text-muted-foreground"} hover:text-primary`}
-              >
-                <Package className="w-4 h-4" />
-                Coupons{" "}
-              </Link>
+
               <Link
                 href="#"
-                className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-              >
+                className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground">
                 <Users className="w-5 h-5" />
                 Customers
               </Link>

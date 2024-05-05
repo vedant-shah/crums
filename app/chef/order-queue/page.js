@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import DataTable from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-
+import supabase from "../../../supabaseClient";
 function OrderQueue() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -62,27 +62,27 @@ function OrderQueue() {
     }
   };
 
-  //   const realtime = supabase
-  //     .channel("order-queue")
-  //     .on(
-  //       "postgres_changes",
-  //       {
-  //         event: "*",
-  //         schema: "public",
-  //         table: "order-queue",
-  //       },
-  //       (payload) => {
-  //         console.log("payload:", payload.eventType);
-  //         if (
-  //           payload.eventType === "INSERT" ||
-  //           payload.eventType === "UPDATE" ||
-  //           payload.eventType === "DELETE"
-  //         ) {
-  //           getAllOrders();
-  //         }
-  //       }
-  //     )
-  //     .subscribe();
+  const realtime = supabase
+    .channel("order-queue")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "order_queue",
+      },
+      (payload) => {
+        console.log("payload:", payload.eventType);
+        if (
+          payload.eventType === "INSERT" ||
+          payload.eventType === "UPDATE" ||
+          payload.eventType === "DELETE"
+        ) {
+          fetchCurrentQueue();
+        }
+      }
+    )
+    .subscribe();
 
   useEffect(() => {
     // Fetch order queue data
