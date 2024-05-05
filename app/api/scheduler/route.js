@@ -1,6 +1,5 @@
 import fs from "fs";
 import { NextResponse } from "next/server";
-import path from "path";
 import supabase from "../supabaseClient";
 
 export async function GET(req, res) {
@@ -34,18 +33,20 @@ export async function GET(req, res) {
   });
   for (let i = 1; i <= table.size; i++) {
     let minCookingItem = orders_copy.reduce((prev, current) => {
-      if (courseOrder[prev.course] < courseOrder[current.course]) {
+      if (courseOrder[prev.item.course] < courseOrder[current.item.course]) {
         return prev;
-      } else if (courseOrder[prev.course] > courseOrder[current.course]) {
+      } else if (
+        courseOrder[prev.item.course] > courseOrder[current.item.course]
+      ) {
         return current;
       } else {
         // if course types are equal, return the order with the lower cooking time
-        return prev.cookTime < current.cookTime ? prev : current;
+        return prev.item.cookTime < current.item.cookTime ? prev : current;
       }
     });
 
     windowOrders = windowOrders.filter((order) => {
-      return order.id !== minCookingItem.id;
+      return order.item.id !== minCookingItem.item.id;
     });
 
     sorted_orders.push(minCookingItem);
@@ -60,7 +61,6 @@ export async function GET(req, res) {
 
   orders_copy = [...windowOrders];
   let serviced_tables = new Set();
-  console.log(sorted_orders);
   while (!eqSet(serviced_tables, lru_table_orders)) {
     lru_table_orders.forEach((table) => {
       orders_copy = windowOrders.filter((order) => {
@@ -69,23 +69,39 @@ export async function GET(req, res) {
 
       if (orders_copy.length !== 0) {
         let minCookingItem = orders_copy.reduce((prev, current) => {
-          if (courseOrder[prev.course] < courseOrder[current.course]) {
+          if (
+            courseOrder[prev.item.course] < courseOrder[current.item.course]
+          ) {
             return prev;
-          } else if (courseOrder[prev.course] > courseOrder[current.course]) {
+          } else if (
+            courseOrder[prev.item.course] > courseOrder[current.item.course]
+          ) {
             return current;
           } else {
             // if course types are equal, return the order with the lower cooking time
-            return prev.cookTime < current.cookTime ? prev : current;
+            return prev.item.cookTime < current.item.cookTime ? prev : current;
           }
         });
         windowOrders = windowOrders.filter((order) => {
-          return order.id !== minCookingItem.id;
+          return order.item.id !== minCookingItem.item.id;
         });
         sorted_orders.push(minCookingItem);
       } else serviced_tables.add(table);
     });
   }
   // fs.writeFileSync(filePath, "[]");
+  const { data, error } = await supabase
+    .from("order_queue")
+    .insert(sorted_orders);
+
+  if (error) {
+    return NextResponse.json({
+      message: error.message,
+      success: false,
+      status: 500,
+      data: [],
+    });
+  }
 
   return NextResponse.json({
     success: true,

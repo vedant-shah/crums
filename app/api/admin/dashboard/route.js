@@ -36,7 +36,15 @@ export async function GET(req, res) {
   );
 
   response.recentOrders = latestMonthOrders.slice(0, 5);
-
+  if (latestMonthOrders.length === 0) {
+    response.mostFrequentItem = ["None"];
+    return NextResponse.json({
+      message: "Analytics data fetched successfully",
+      success: true,
+      data: response,
+      status: 200,
+    });
+  }
   const items = latestMonthOrders.reduce((acc, curr) => {
     curr.items.forEach((item) => {
       acc[item.name] = acc[item.name] || 0;

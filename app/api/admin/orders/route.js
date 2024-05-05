@@ -24,8 +24,15 @@ export async function GET(req, res) {
   for (const order of readyToPayOrders) {
     const { tableNumber, total, gst, items } = order;
     if (!groupedOrders[tableNumber]) {
-      groupedOrders[tableNumber] = { total: 0, gst: 0, items: [], tableNumber };
+      groupedOrders[tableNumber] = {
+        total: 0,
+        gst: 0,
+        items: [],
+        tableNumber,
+        orderIds: [],
+      };
     }
+    groupedOrders[tableNumber].orderIds.push(order.orderId);
     groupedOrders[tableNumber].total += total;
     groupedOrders[tableNumber].gst += gst;
     groupedOrders[tableNumber].items.push(...items);

@@ -23,7 +23,7 @@ export async function PUT(req, { params }) {
 
     data[0].items.forEach((item) => {
       windowOrders.push({
-        ...item,
+        item: { ...item },
         orderid,
         tableNumber: data[0].tableNumber,
         specialInstructions: data[0].specialInstructions,

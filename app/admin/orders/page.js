@@ -108,6 +108,10 @@ function Orders() {
     getAllOrders();
   }, []);
 
+  useEffect(() => {
+    console.log(selectedOrder);
+  }, [selectedOrder]);
+
   const requestPayment = async (tableNumber) => {
     const confirmed = confirm(
       "Are you sure you want to request bill for this table?"
@@ -150,8 +154,9 @@ function Orders() {
     );
     if (!confirmed) return;
     try {
-      const response = await fetch(`/api/markaspaid/${selectedOrder.orderId}`, {
+      const response = await fetch(`/api/markaspaid`, {
         method: "POST",
+        body: JSON.stringify(selectedOrder.orderIds),
       });
       const data = await response.json();
       if (!data.success) throw data.message;
@@ -264,8 +269,7 @@ function Orders() {
                 setCurrentTab(1);
                 setSelectedOrder(null);
               }}
-              value="new"
-            >
+              value="new">
               <div className="flex items-center gap-1">
                 New
                 <Badge className="flex items-center justify-center w-4 h-4 ml-auto rounded-full shrink-0">
@@ -278,8 +282,7 @@ function Orders() {
                 setCurrentTab(2);
                 setSelectedOrder(null);
               }}
-              value="current"
-            >
+              value="current">
               <div className="flex items-center gap-1">
                 Ongoing
                 <Badge className="flex items-center justify-center w-4 h-4 ml-auto rounded-full shrink-0">
@@ -292,8 +295,7 @@ function Orders() {
                 setCurrentTab(3);
                 setSelectedOrder(null);
               }}
-              value="Payment"
-            >
+              value="Payment">
               <div className="flex items-center gap-1">
                 Payment
                 <Badge className="flex items-center justify-center w-4 h-4 ml-auto rounded-full shrink-0">
@@ -306,8 +308,7 @@ function Orders() {
                 setCurrentTab(4);
                 setSelectedOrder(null);
               }}
-              value="Completed"
-            >
+              value="Completed">
               <div className="flex items-center gap-1">
                 Completed
                 <Badge className="flex items-center justify-center w-4 h-4 ml-auto bg-gray-300 rounded-full shrink-0">
@@ -318,8 +319,7 @@ function Orders() {
           </TabsList>
           <TabsContent
             value="new"
-            style={{ height: "80vh", overflowY: "auto" }}
-          >
+            style={{ height: "80vh", overflowY: "auto" }}>
             {loading ? (
               <>loading...</>
             ) : (
@@ -328,8 +328,7 @@ function Orders() {
                   key={order.orderId}
                   className={`w-full p-3 mb-2 rounded-lg ${order === selectedOrder ? "bg-zinc-700" : "bg-zinc-800 "}`}
                   onClick={() => setSelectedOrder(order)}
-                  style={{ cursor: "pointer" }}
-                >
+                  style={{ cursor: "pointer" }}>
                   <p className="text-sm font-normal">
                     <span className="font-bold">Table {order.tableNumber}</span>{" "}
                     - {dayjs(order.created_at).format("h:mm A, 	MMMM D ")}
@@ -347,8 +346,7 @@ function Orders() {
                   key={order.orderId}
                   className={`w-full p-3 mb-2 rounded-lg ${order === selectedOrder ? "bg-zinc-700" : "bg-zinc-800 "}`}
                   onClick={() => setSelectedOrder(order)}
-                  style={{ cursor: "pointer" }}
-                >
+                  style={{ cursor: "pointer" }}>
                   <p className="text-sm font-normal">
                     <span className="font-bold">Table {order.tableNumber}</span>{" "}
                     - {dayjs(order.created_at).format("h:mm A, 	MMMM D ")}
@@ -366,8 +364,7 @@ function Orders() {
                   key={order.orderId}
                   className={`w-full p-3 mb-2 rounded-lg ${order === selectedOrder ? "bg-zinc-700" : "bg-zinc-800 "}`}
                   onClick={() => setSelectedOrder(order)}
-                  style={{ cursor: "pointer" }}
-                >
+                  style={{ cursor: "pointer" }}>
                   <p className="text-sm font-normal">
                     <span className="font-bold">Table {order.tableNumber}</span>{" "}
                     - {dayjs(order.created_at).format("h:mm A, 	MMMM D ")}
@@ -385,8 +382,7 @@ function Orders() {
                   key={order.orderId}
                   className={`w-full p-3 mb-2 rounded-lg ${order === selectedOrder ? "bg-zinc-700" : "bg-zinc-800 "}`}
                   onClick={() => setSelectedOrder(order)}
-                  style={{ cursor: "pointer" }}
-                >
+                  style={{ cursor: "pointer" }}>
                   <p className="text-sm font-normal">
                     <span className="font-bold">Table {order.tableNumber}</span>{" "}
                     - {dayjs(order.created_at).format("h:mm A, 	MMMM D ")}
@@ -446,8 +442,7 @@ function Orders() {
                 </div>
                 <div
                   className="flex flex-col bottom"
-                  style={{ flex: "0 0 auto" }}
-                >
+                  style={{ flex: "0 0 auto" }}>
                   <div className="flex items-center justify-between px-3 mt-8">
                     <h1>Item Total</h1>
                     <h1>₹{selectedOrder.total.toFixed(2)}</h1>
@@ -489,8 +484,7 @@ function Orders() {
                         variant=""
                         onClick={() =>
                           requestPayment(selectedOrder.tableNumber)
-                        }
-                      >
+                        }>
                         Request Payment
                       </Button>
                     </div>
