@@ -15,13 +15,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogTitle,
-  DialogHeader,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 import {
   InputOTP,
   InputOTPGroup,
@@ -314,22 +309,39 @@ function Navbar() {
         <SheetContent
           side="left"
           onOpenAutoFocus={(e) => e.preventDefault()}
-          className="flex flex-col"
-        >
+          className="flex flex-col">
           <SheetHeader
             className="h-[10vh] flex flex-col justify-around"
-            style={{ flex: "0 0 auto" }}
-          >
+            style={{ flex: "0 0 auto" }}>
             <SheetTitle className="mb-3 text-3xl">
               Your Current Orders
             </SheetTitle>
-
             <hr className="my-2" />
+            <div className="flex items-center justify-between w-full ">
+              <h1>
+                Progress:{" "}
+                {(runningOrders?.allItems?.filter(
+                  (item) => item.status === "Prepared"
+                ).length *
+                  100) /
+                  runningOrders?.allItems?.length +
+                  "%"}{" "}
+              </h1>
+              <Progress
+                value={
+                  (runningOrders?.allItems?.filter(
+                    (item) => item.status === "Prepared"
+                  ).length *
+                    100) /
+                  runningOrders?.allItems?.length
+                }
+                className="w-[50%]"
+              />
+            </div>
           </SheetHeader>
           <ScrollArea
-            className="flex items-center justify-center"
-            style={{ flex: "1 1 auto" }}
-          >
+            className="flex items-center justify-center py-4"
+            style={{ flex: "1 1 auto" }}>
             {runningOrders?.allItems?.length === 0 &&
               runningOrders?.pendingPayment === "0.00" && (
                 <>
@@ -343,7 +355,7 @@ function Navbar() {
               )}
             {runningOrders?.pendingPayment > 0 && (
               <>
-                <div className="flex  items-center justify-between w-full mb-3">
+                <div className="flex items-center justify-between w-full mb-3">
                   <p className="text-base font-bold">Pending Payment:</p>
                   <Badge variant="warning">
                     ₹ {runningOrders?.pendingPayment}
@@ -378,7 +390,14 @@ function Navbar() {
                         )}
                       </div>
                       <div>
-                        <h1 className="inline-flex ">{dish.name}</h1>
+                        <h1
+                          className="inline-flex font-xs "
+                          style={{
+                            color:
+                              dish.status === "Pending" ? "#ffbf00" : "#bcfaa4",
+                          }}>
+                          {dish.name}
+                        </h1>
                       </div>
                     </div>
                     <div className="flex items-center">
@@ -397,8 +416,7 @@ function Navbar() {
           <hr style={{ border: "1px dashed" }} />
           <div
             className="flex flex-col justify-end "
-            style={{ flex: "0 0 auto" }}
-          >
+            style={{ flex: "0 0 auto" }}>
             <div className="flex flex-col">
               <h1 className="mb-2 font-bold">Bill Details</h1>
               <div className="flex justify-between ">
@@ -419,10 +437,15 @@ function Navbar() {
               </h1>
             </div>
             <Button
-              disabled={loading || runningOrders?.allItems.length === 0}
+              disabled={
+                loading ||
+                runningOrders?.allItems.length === 0 ||
+                runningOrders?.allItems.filter(
+                  (item) => item.status === "Pending"
+                ).length !== 0
+              }
               onClick={requestBill}
-              className="flex items-center"
-            >
+              className="flex items-center">
               {loading && <Loader className="w-5 h-5 " />}
               Request Bill
             </Button>
@@ -440,13 +463,11 @@ function Navbar() {
         </SheetTrigger>
         <SheetContent
           onOpenAutoFocus={(e) => e.preventDefault()}
-          className="flex flex-col"
-        >
+          className="flex flex-col">
           <SheetHeader
             className="h-[15vh] flex flex-col justify-around"
-            style={{ flex: "0 0 auto" }}
-          >
-            <SheetTitle className="mb-3 text-3xl">
+            style={{ flex: "0 0 auto" }}>
+            <SheetTitle className="text-3xl ">
               Table:{" "}
               {typeof localStorage !== "undefined" &&
                 localStorage.getItem("tableNo")}
@@ -454,27 +475,25 @@ function Navbar() {
             {typeof localStorage !== "undefined" &&
             localStorage.getItem("userData") ? (
               <>
-                Not +
-                {`${JSON.parse(localStorage.getItem("userData"))?.user?.phone}`.substring(
-                  0,
-                  2
-                )}{" "}
-                {`${JSON.parse(localStorage.getItem("userData"))?.user?.phone}`.substring(
-                  2
-                )}{" "}
-                ?
                 <span>
+                  Not +
+                  {`${JSON.parse(localStorage.getItem("userData"))?.user?.phone}`.substring(
+                    0,
+                    2
+                  )}{" "}
+                  {`${JSON.parse(localStorage.getItem("userData"))?.user?.phone}`.substring(
+                    2
+                  )}{" "}
+                  ?{" "}
                   <span
                     className="text-blue-500 underline"
                     onClick={() => {
                       localStorage.removeItem("userData");
                       setOtpPage("send");
                       setOpenLoginDialogue(true);
-                    }}
-                  >
-                    Click here
+                    }}>
+                    Change
                   </span>{" "}
-                  to change phone number
                 </span>
               </>
             ) : (
@@ -484,8 +503,7 @@ function Navbar() {
                   onClick={() => {
                     setOpenLoginDialogue(true);
                     setOtpPage("send");
-                  }}
-                >
+                  }}>
                   Login
                 </span>{" "}
               </>
@@ -494,8 +512,7 @@ function Navbar() {
           </SheetHeader>
           <ScrollArea
             className="flex items-center justify-center"
-            style={{ flex: "1 1 auto" }}
-          >
+            style={{ flex: "1 1 auto" }}>
             {items.length === 0 && (
               <>
                 <div className="flex flex-col items-center justify-center h-full">
@@ -545,8 +562,7 @@ function Navbar() {
                         onClick={() => {
                           updateItemQuantity(dish.id, dish.quantity - 1);
                         }}
-                        style={{ borderRadius: "5px 0 0 5px" }}
-                      >
+                        style={{ borderRadius: "5px 0 0 5px" }}>
                         -
                       </Badge>
                       <Badge variant="secondary" style={{ borderRadius: "0" }}>
@@ -556,8 +572,7 @@ function Navbar() {
                         onClick={() => {
                           updateItemQuantity(dish.id, dish.quantity + 1);
                         }}
-                        style={{ borderRadius: "0 5px  5px 0" }}
-                      >
+                        style={{ borderRadius: "0 5px  5px 0" }}>
                         +
                       </Badge>
                     </div>
@@ -571,8 +586,7 @@ function Navbar() {
           </ScrollArea>
           <div
             className="flex flex-col justify-end "
-            style={{ flex: "0 0 auto" }}
-          >
+            style={{ flex: "0 0 auto" }}>
             <input type="text" autoFocus="true" className="hidden" />
             <Textarea
               className="my-3"
@@ -600,8 +614,7 @@ function Navbar() {
             <Button
               disabled={items.length === 0}
               onClick={placeOrder}
-              className="flex items-center"
-            >
+              className="flex items-center">
               {loading && <Loader className="w-5 h-5 " />}
               Order
             </Button>
@@ -618,8 +631,7 @@ function Navbar() {
                 <div className="flex items-center ">
                   <Button
                     className="w-10 h-10 font-bold"
-                    style={{ borderRadius: "5px 0 0 5px" }}
-                  >
+                    style={{ borderRadius: "5px 0 0 5px" }}>
                     +91
                   </Button>
                   <Input
@@ -636,8 +648,7 @@ function Navbar() {
                 <Button
                   disabled={phone.length !== 10}
                   onClick={sendOTP}
-                  className="flex items-center"
-                >
+                  className="flex items-center">
                   {loading && <Loader className="w-5 h-5 " />}
                   Send Otp
                 </Button>
@@ -649,8 +660,7 @@ function Navbar() {
                   Not {phone} ? <br />
                   <span
                     className="text-blue-500 underline"
-                    onClick={() => setOtpPage("send")}
-                  >
+                    onClick={() => setOtpPage("send")}>
                     Click here
                   </span>{" "}
                   to change Phone number
@@ -664,8 +674,7 @@ function Navbar() {
                   }}
                   onComplete={() => {
                     verifyOTP();
-                  }}
-                >
+                  }}>
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />
                     <InputOTPSlot index={1} />

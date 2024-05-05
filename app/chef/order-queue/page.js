@@ -1,10 +1,15 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import DataTable from "@/components/ui/data-table";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 function OrderQueue() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const { toast } = useToast();
+
   const fetchCurrentQueue = async () => {
     setLoading(true);
     try {
@@ -15,9 +20,45 @@ function OrderQueue() {
       }
       setData(jres.data);
     } catch (e) {
+      toast({
+        title: "Error",
+        description: e,
+        variant: "error",
+        duration: 1500,
+      });
       console.log(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const markDishAsPrepared = async (dish) => {
+    const cnf = confirm("Are you sure you want to mark this dish as prepared?");
+    if (!cnf) return;
+    try {
+      const res = await fetch("/api/chef/markdishasprepared", {
+        method: "POST",
+        body: JSON.stringify(dish),
+      });
+      const jres = await res.json();
+      if (!jres.success) {
+        throw jres.message;
+      }
+      toast({
+        title: "Success",
+        description: jres.message,
+        variant: "success",
+        duration: 1500,
+      });
+      fetchCurrentQueue();
+    } catch (e) {
+      console.log(e);
+      toast({
+        title: "Error",
+        description: e,
+        variant: "error",
+        duration: 1500,
+      });
     }
   };
 
@@ -58,7 +99,7 @@ function OrderQueue() {
     {
       header: "Item",
       accessorKey: "item",
-      size: 100,
+      size: 120,
       cell: ({ row }) => {
         return (
           <div className="flex flex-col justify-center">
@@ -104,6 +145,14 @@ function OrderQueue() {
     {
       header: "Special Instructions",
       accessorKey: "specialInstructions",
+      size: 250,
+      cell: ({ row }) => {
+        return (
+          <div className="flex flex-col justify-center">
+            <h1>{row.original.specialInstructions || "-"}</h1>
+          </div>
+        );
+      },
     },
     {
       header: "Course",
@@ -130,15 +179,30 @@ function OrderQueue() {
     },
     {
       header: "Action",
-      accessorKey: "",
+      size: 50,
+      cell: ({ row }) => {
+        return (
+          <div className="w-[100px]">
+            <Button onClick={() => markDishAsPrepared(row.original)}>
+              Mark as Completed
+            </Button>
+          </div>
+        );
+      },
     },
   ];
 
   return (
-    <div className="container flex flex-col py-3 h-[100vh]  justify-center ">
-      <h1 className="mx-auto text-2xl font-bold">Welcome to CRUMS!</h1>
+    <div className="container flex flex-col py-3 h-[100vh] w-[100vw]  justify-center ">
       {!loading && (
-        <DataTable columns={columns} data={data} searchColumn={"item"} />
+        <>
+          <h1 className="mx-auto text-2xl font-bold my-14">Today's Orders!</h1>
+          <DataTable columns={columns} data={data} />
+          <footer className="flex items-center justify-between p-4 ">
+            <p className="text-gray">© 2023-24 CRUMS</p>
+            <p className="text-gray">All rights reserved</p>
+          </footer>
+        </>
       )}
     </div>
   );

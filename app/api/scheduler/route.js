@@ -7,7 +7,12 @@ export async function GET(req, res) {
   const fileContents = fs.readFileSync("./app/api/windowOrders.json", "utf8");
   let windowOrders = JSON.parse(fileContents);
   if (windowOrders.length === 0) {
-    return;
+    return NextResponse.json({
+      message: "No orders in the queue",
+      success: true,
+      data: [],
+      status: 200,
+    });
   }
 
   const eqSet = (as, bs) => {
@@ -89,7 +94,7 @@ export async function GET(req, res) {
       } else serviced_tables.add(table);
     });
   }
-  // fs.writeFileSync(filePath, "[]");
+  fs.writeFileSync("./app/api/windowOrders.json", "[]");
   const { data, error } = await supabase
     .from("order_queue")
     .insert(sorted_orders);

@@ -35,7 +35,7 @@ function DataTable({ columns, data, searchColumn, disablePagination = false }) {
 
     return (
         <>
-            <div className="flex items-center py-4">
+            {searchColumn && <div className="flex items-center py-4">
                 <Input
                     placeholder="Search..."
                     value={table.getColumn(searchColumn)?.getFilterValue() ?? ""}
@@ -44,7 +44,7 @@ function DataTable({ columns, data, searchColumn, disablePagination = false }) {
                     }
                     className="max-w-sm"
                 />
-            </div>
+            </div>}
             <div className="border rounded-md">
                 <Table>
                     <TableHeader>

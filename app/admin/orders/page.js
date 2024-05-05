@@ -10,19 +10,13 @@ import { FiClock } from "react-icons/fi";
 import DataTable from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 
 function Orders() {
   var relativeTime = require("dayjs/plugin/relativeTime");
   dayjs.extend(relativeTime);
   const { toast } = useToast();
+  const [progress, setProgress] = useState(0);
 
   const columns = [
     {
@@ -64,6 +58,21 @@ function Orders() {
       header: "Price",
       cell: ({ row }) => {
         return <p>₹{row.original.price}</p>;
+      },
+      size: 50,
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        return (
+          <p
+            style={{
+              color: row.original.status === "Pending" ? "#ffbf00" : "#bcfaa4",
+            }}>
+            {row.original.status}
+          </p>
+        );
       },
       size: 50,
     },
@@ -432,6 +441,27 @@ function Orders() {
                       </p>
                     </div>
                   )}
+                  <div className="flex items-center justify-between w-full my-4">
+                    <h1>
+                      Progress:{" "}
+                      {(selectedOrder.items.filter(
+                        (item) => item.status === "Prepared"
+                      ).length *
+                        100) /
+                        selectedOrder.items.length +
+                        "%"}{" "}
+                    </h1>
+                    <Progress
+                      value={
+                        (selectedOrder.items.filter(
+                          (item) => item.status === "Prepared"
+                        ).length *
+                          100) /
+                        selectedOrder.items.length
+                      }
+                      className="w-[50%]"
+                    />
+                  </div>
                 </div>
                 <div className="flex-auto overflow-y-auto middle">
                   <DataTable
