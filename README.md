@@ -1,5 +1,8 @@
 # CRUMS: Comprehensive Restaurant Management System 🍽️
 
+[![Crums intro](
+https://youtu.be/ZiyhCg0iiLo?si=zcDLcIdTS5YNJ86r)]
+
 CRUMS is a cutting-edge restaurant management system that revolutionizes the dining experience while enhancing operational efficiency. Leveraging the power of Next.js and PostgreSQL with Supabase, CRUMS seamlessly integrates QR code-based tableside ordering, interactive menu management, and real-time insights for both customers and administrators.
 
 ## Features 🌟
